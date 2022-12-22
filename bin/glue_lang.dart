@@ -5,7 +5,9 @@ import 'values/values.dart';
 import 'vm.dart';
 
 void repl() {
-  print("[ Glue v0.0.1 ]");
+  print("Glue REPL v0.0.1");
+  print("Copyright (c) 2022 Parau Ionut Alexandru");
+  print("License available at https://github.com/IonutParau/glue_lang/blob/main/LICENSE");
   final vm = GlueVM();
   final stack = GlueStack();
   vm.loadStandard();
