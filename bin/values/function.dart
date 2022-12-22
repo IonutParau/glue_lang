@@ -13,7 +13,7 @@ class GlueFunction extends GlueValue {
 
   @override
   GlueValue forMacros() {
-    return GlueList([GlueString("function"), this]);
+    return GlueList([GlueString("internal-function"), GlueList(args.map((a) => GlueString(a)).toList()), body.forMacros()]);
   }
 
   @override
@@ -52,7 +52,7 @@ class GlueExternalFunction extends GlueValue {
 
   @override
   GlueValue forMacros() {
-    return GlueList([GlueString("function"), this]);
+    return GlueList([GlueString("external-function"), this]);
   }
 
   @override

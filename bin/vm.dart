@@ -14,12 +14,25 @@ class GlueStackVar {
 class GlueStack {
   final List<GlueStackVar> _stack = [];
 
+  int? old;
+
   void push(String name, GlueValue val) {
     _stack.add(GlueStackVar(name, val));
   }
 
   void empty() {
     _stack.clear();
+  }
+
+  void save() {
+    old = _stack.length;
+  }
+
+  void restore() {
+    if (old == null) return;
+    while (_stack.length > old!) {
+      _stack.removeLast();
+    }
   }
 
   GlueValue? read(String name) {
@@ -300,7 +313,7 @@ class GlueVM {
       final b = args[1];
 
       if (a is GlueNumber && b is GlueNumber) {
-        return GlueBool(a.n > b.n);
+        return GlueBool(a.n < b.n);
       }
 
       return GlueBool(false);
@@ -428,6 +441,7 @@ class GlueVM {
     });
 
     globals["or"] = GlueExternalFunction((vm, stack, args) {
+      args = processedArgs(stack, args);
       if (args.length != 2) throw "or wasn't given 2 arguments (more specifically, was given ${args.length})";
 
       final a = args[0];
@@ -440,6 +454,7 @@ class GlueVM {
     });
 
     globals["list-get"] = GlueExternalFunction((vm, stack, args) {
+      args = processedArgs(stack, args);
       if (args.length != 2) throw "list-get wasn't given 2 arguments (more specifically, was given ${args.length})";
 
       final list = args[0];
@@ -458,6 +473,7 @@ class GlueVM {
     });
 
     globals["list-set"] = GlueExternalFunction((vm, stack, args) {
+      args = processedArgs(stack, args);
       if (args.length != 3) throw "list-set wasn't given 3 arguments (more specifically, was given ${args.length})";
 
       final list = args[0];
@@ -480,6 +496,7 @@ class GlueVM {
     });
 
     globals["list-size"] = GlueExternalFunction((vm, stack, args) {
+      args = processedArgs(stack, args);
       if (args.length != 1) throw "list-size wasn't given 1 argument (more specifically, was given ${args.length})";
 
       final list = args[0];
@@ -490,6 +507,7 @@ class GlueVM {
     });
 
     globals["table-get"] = GlueExternalFunction((vm, stack, args) {
+      args = processedArgs(stack, args);
       if (args.length != 2) throw "list-get wasn't given 2 arguments (more specifically, was given ${args.length})";
 
       final table = args[0];
@@ -501,6 +519,7 @@ class GlueVM {
     });
 
     globals["table-set"] = GlueExternalFunction((vm, stack, args) {
+      args = processedArgs(stack, args);
       if (args.length != 3) throw "table-set wasn't given 3 arguments (more specifically, was given ${args.length})";
 
       final table = args[0];
@@ -513,6 +532,7 @@ class GlueVM {
     });
 
     globals["table-size"] = GlueExternalFunction((vm, stack, args) {
+      args = processedArgs(stack, args);
       if (args.length != 1) throw "table-size wasn't given 1 argument (more specifically, was given ${args.length})";
 
       final table = args[0];
@@ -758,6 +778,151 @@ class GlueVM {
       vm.globals[name.varname] = val;
 
       return val;
+    });
+
+    globals["for-macros"] = GlueExternalFunction((vm, stack, args) {
+      args = processedArgs(stack, args);
+      if (args.length != 1) {
+        throw "for-macros wasn't given 1 argument (more specifically, was given ${args.length}";
+      }
+
+      return args[0].forMacros();
+    });
+
+    globals["for-macros-unprocessed"] = GlueExternalFunction((vm, stack, args) {
+      if (args.length != 1) {
+        throw "for-macros-unprocessed wasn't given 1 argument (more specifically, was given ${args.length}";
+      }
+
+      return args[0].forMacros();
+    });
+
+    globals["fn-body"] = GlueExternalFunction((vm, stack, args) {
+      args = processedArgs(stack, args);
+      if (args.length != 1) {
+        throw "fn-body wasn't given 1 argument (more specifically, was given ${args.length}";
+      }
+
+      final fn = args[0];
+
+      if (fn is! GlueFunction) return GlueNull();
+
+      return fn.body.forMacros();
+    });
+
+    globals["fn-args"] = GlueExternalFunction((vm, stack, args) {
+      args = processedArgs(stack, args);
+      if (args.length != 1) {
+        throw "fn-body wasn't given 1 argument (more specifically, was given ${args.length}";
+      }
+
+      final fn = args[0];
+
+      if (fn is! GlueFunction) return GlueNull();
+
+      return GlueList(fn.args.map((a) => GlueString(a)).toList());
+    });
+
+    globals["for"] = GlueExternalFunction((vm, stack, args) {
+      stack.save();
+
+      if (args.length != 4) {
+        throw "for wasn't given 4 arguments (more specifically, was given ${args.length})";
+      }
+
+      final setup = args[0];
+      final condition = args[1];
+      final next = args[2];
+      final body = args[3];
+
+      GlueValue last = GlueNull();
+
+      setup.toValue(vm, stack);
+      while (true) {
+        final result = condition.toValue(vm, stack);
+        if (result is! GlueBool) break;
+        if (!result.b) break;
+        last = body.toValue(vm, stack);
+        next.toValue(vm, stack);
+      }
+
+      stack.restore();
+      return last;
+    });
+
+    globals["while"] = GlueExternalFunction((vm, stack, args) {
+      if (args.length != 2) {
+        throw "while wasn't given 2 arguments (more specifically, was given ${args.length})";
+      }
+
+      stack.save();
+
+      GlueValue last = GlueNull();
+
+      final condition = args[0];
+      final body = args[1];
+
+      while (true) {
+        final result = condition.toValue(vm, stack);
+        if (result is! GlueBool) break;
+        if (!result.b) break;
+        last = body.toValue(vm, stack);
+      }
+
+      stack.restore();
+
+      return last;
+    });
+
+    globals["for-each"] = GlueExternalFunction((vm, stack, args) {
+      if (args.length != 3) {
+        throw "for-each wasn't given 3 arguments (more specifically, was given ${args.length})";
+      }
+
+      final val = args[0].toValue(vm, stack);
+      final vars = args[1];
+
+      if (val is! GlueList && val is! GlueTable) return GlueNull();
+      if (vars is! GlueList) return GlueNull();
+
+      final body = args[2];
+      GlueValue last = GlueNull();
+
+      final varNames = [];
+
+      for (var v in vars.vals) {
+        if (v is GlueVariable) {
+          varNames.add(v.varname);
+        }
+      }
+
+      if (varNames.length != 2) {
+        throw "for-each callback must have 2 arguments (and those arguments must be variables)";
+      }
+
+      if (val is GlueList) {
+        var i = 0;
+        for (var v in val.vals) {
+          stack.save();
+          stack.push(varNames[0], GlueNumber(i.toDouble()));
+          stack.push(varNames[1], v);
+          last = body.toValue(vm, stack);
+          stack.restore();
+          i++;
+        }
+      } else if (val is GlueTable) {
+        val.val.forEach(
+          (key, value) {
+            stack.save();
+            stack.push(varNames[0], key.toValue(vm, stack));
+            stack.push(varNames[1], value.toValue(vm, stack));
+            last = body.toValue(vm, stack);
+            stack.restore();
+          },
+        );
+      }
+
+      return last;
     });
   }
 

@@ -88,7 +88,81 @@ abstract class GlueValue {
   GlueValue invoke(GlueVM vm, GlueStack stack, List<GlueValue> args);
 
   static GlueValue fromMacro(GlueValue val) {
-    throw UnimplementedError("GlueValue.fromMacro is not yet implemented.");
+    if (val is! GlueList) return GlueNull();
+
+    if (val.vals.isEmpty) return GlueNull();
+
+    final typeExpr = val.vals[0];
+
+    if (typeExpr is! GlueString) return GlueNull();
+
+    final type = typeExpr.str;
+
+    if (type == "null") return GlueNull();
+
+    final justOnTheSide = ["external-function", "number", "string", "regex", "bool"];
+
+    if (justOnTheSide.contains(type) && val.vals.length > 1) {
+      return val.vals[1];
+    }
+
+    if (type == "var" && val.vals.length > 1) {
+      if (val.vals[1] is! GlueString) return GlueNull();
+      return GlueVariable((val.vals[1] as GlueString).str);
+    }
+
+    if (type == "expression" && val.vals.length > 2) {
+      final op = GlueValue.fromMacro(val.vals[1]);
+      final argsAST = val.vals[2];
+      if (argsAST is! GlueList) return GlueNull();
+      final args = argsAST.vals.map(GlueValue.fromMacro).toList();
+
+      return GlueExpression(op, args);
+    }
+
+    if (type == "list" && val.vals.length > 1) {
+      final list = val.vals[1];
+
+      if (list is! GlueList) return GlueNull();
+
+      return GlueList(list.vals.map(GlueValue.fromMacro).toList());
+    }
+
+    if (type == "table" && val.vals.length > 1) {
+      final table = val.vals[1];
+
+      if (table is! GlueTable) return GlueNull();
+
+      return GlueTable(
+        table.val.map(
+          (key, value) => MapEntry(
+            GlueValue.fromMacro(key),
+            GlueValue.fromMacro(value),
+          ),
+        ),
+      );
+    }
+
+    if (type == "internal-function" && val.vals.length > 2) {
+      final argsAST = val.vals[1];
+      final bodyAST = val.vals[2];
+
+      if (argsAST is! GlueList) return GlueNull();
+
+      final args = <String>[];
+
+      for (var a in argsAST.vals) {
+        if (a is GlueString) args.add(a.str);
+      }
+
+      return GlueFunction(args, GlueValue.fromMacro(bodyAST));
+    }
+
+    if (type == "macro" && val.vals.length > 1) {
+      return GlueMacro(GlueValue.fromMacro(val.vals[0]));
+    }
+
+    return GlueNull();
   }
 
   static GlueValue fromString(String str) {
@@ -156,10 +230,7 @@ dynamic glueSendAsExpressionJSON(GlueValue val) {
       "type": "external-function",
     };
   } else if (val is GlueList) {
-    return {
-      "type": "list",
-      "vals": val.vals.map(glueSendAsExpressionJSON).toList()
-    };
+    return {"type": "list", "vals": val.vals.map(glueSendAsExpressionJSON).toList()};
   } else if (val is GlueTable) {
     return {
       "type": "table",

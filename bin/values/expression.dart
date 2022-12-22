@@ -8,7 +8,7 @@ class GlueExpression extends GlueValue {
 
   @override
   GlueValue toValue(GlueVM vm, GlueStack stack) {
-    if (operation is GlueExpression) {
+    if (operation is! GlueVariable) {
       final opr = operation.toValue(vm, stack);
       if (args.isEmpty) return opr;
       final vals = [];
@@ -30,8 +30,8 @@ class GlueExpression extends GlueValue {
   GlueValue forMacros() {
     return GlueList([
       GlueString("expression"),
-      operation,
-      GlueList(args),
+      operation.forMacros(),
+      GlueList(args.map((a) => a.forMacros()).toList()),
     ]);
   }
 

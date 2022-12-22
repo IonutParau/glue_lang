@@ -22,6 +22,6 @@ class GlueList extends GlueValue {
 
   @override
   String asString(GlueVM vm, GlueStack stack) {
-    return vals.map((e) => e.asString(vm, stack)).toString();
+    return vals.map((e) => e.asString(vm, stack)).toList().toString();
   }
 }

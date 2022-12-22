@@ -55,7 +55,7 @@ class GlueTable extends GlueValue {
 
   @override
   GlueValue forMacros() {
-    return GlueList([GlueString("table"), GlueTable(val.map((key, value) => MapEntry(key, value.forMacros())))]);
+    return GlueList([GlueString("table"), GlueTable(val.map((key, value) => MapEntry(key.forMacros(), value.forMacros())))]);
   }
 
   @override
