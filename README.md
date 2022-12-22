@@ -1,3 +1,3 @@
 # Glue
 
-A LISP-based interpreted scripting language.
+A LISP-like interpreted scripting language.

@@ -62,11 +62,7 @@ class GlueVM {
     });
 
     globals["write"] = GlueExternalFunction((vm, stack, args) {
-      stdout.writeAll(
-          args
-              .map((arg) => arg.toValue(vm, stack).asString(vm, stack))
-              .toList(),
-          ' ');
+      stdout.writeAll(args.map((arg) => arg.toValue(vm, stack).asString(vm, stack)).toList(), ' ');
       return GlueNull();
     });
 
@@ -79,8 +75,9 @@ class GlueVM {
     });
 
     globals["if"] = GlueExternalFunction((vm, stack, args) {
-      if (args.length != 2)
+      if (args.length != 2) {
         throw "if wasn't given 2 arguments (more specifically, was given ${args.length})";
+      }
 
       final condition = args[0].toValue(vm, stack);
       final body = args[1];
@@ -125,8 +122,9 @@ class GlueVM {
 
     globals["+"] = GlueExternalFunction((vm, stack, args) {
       args = processedArgs(stack, args);
-      if (args.length != 2)
+      if (args.length != 2) {
         throw "+ wasn't given 2 arguments (more specifically, was given ${args.length})";
+      }
 
       final a = args[0];
       final b = args[1];
@@ -156,8 +154,9 @@ class GlueVM {
 
     globals["-"] = GlueExternalFunction((vm, stack, args) {
       args = processedArgs(stack, args);
-      if (args.length != 2)
+      if (args.length != 2) {
         throw "- wasn't given 2 arguments (more specifically, was given ${args.length})";
+      }
 
       final a = args[0];
       final b = args[1];
@@ -179,8 +178,9 @@ class GlueVM {
 
     globals["*"] = GlueExternalFunction((vm, stack, args) {
       args = processedArgs(stack, args);
-      if (args.length != 2)
+      if (args.length != 2) {
         throw "* wasn't given 2 arguments (more specifically, was given ${args.length})";
+      }
 
       final a = args[0];
       final b = args[1];
@@ -194,8 +194,9 @@ class GlueVM {
 
     globals["/"] = GlueExternalFunction((vm, stack, args) {
       args = processedArgs(stack, args);
-      if (args.length != 2)
+      if (args.length != 2) {
         throw "/ wasn't given 2 arguments (more specifically, was given ${args.length})";
+      }
 
       final a = args[0];
       final b = args[1];
@@ -215,8 +216,7 @@ class GlueVM {
 
     globals["%"] = GlueExternalFunction((vm, stack, args) {
       args = processedArgs(stack, args);
-      if (args.length != 2)
-        throw "% wasn't given 2 arguments (more specifically, was given ${args.length})";
+      if (args.length != 2) throw "% wasn't given 2 arguments (more specifically, was given ${args.length})";
 
       final a = args[0];
       final b = args[1];
@@ -236,8 +236,7 @@ class GlueVM {
 
     globals["^"] = GlueExternalFunction((vm, stack, args) {
       args = processedArgs(stack, args);
-      if (args.length != 2)
-        throw "^ wasn't given 2 arguments (more specifically, was given ${args.length})";
+      if (args.length != 2) throw "^ wasn't given 2 arguments (more specifically, was given ${args.length})";
 
       final a = args[0];
       final b = args[1];
@@ -251,8 +250,7 @@ class GlueVM {
 
     globals["="] = GlueExternalFunction((vm, stack, args) {
       args = processedArgs(stack, args);
-      if (args.length != 2)
-        throw "= wasn't given 2 arguments (more specifically, was given ${args.length})";
+      if (args.length != 2) throw "= wasn't given 2 arguments (more specifically, was given ${args.length})";
 
       final a = args[0];
       final b = args[1];
@@ -282,8 +280,7 @@ class GlueVM {
 
     globals[">"] = GlueExternalFunction((vm, stack, args) {
       args = processedArgs(stack, args);
-      if (args.length != 2)
-        throw "> wasn't given 2 arguments (more specifically, was given ${args.length})";
+      if (args.length != 2) throw "> wasn't given 2 arguments (more specifically, was given ${args.length})";
 
       final a = args[0];
       final b = args[1];
@@ -297,8 +294,7 @@ class GlueVM {
 
     globals["<"] = GlueExternalFunction((vm, stack, args) {
       args = processedArgs(stack, args);
-      if (args.length != 2)
-        throw "< wasn't given 2 arguments (more specifically, was given ${args.length})";
+      if (args.length != 2) throw "< wasn't given 2 arguments (more specifically, was given ${args.length})";
 
       final a = args[0];
       final b = args[1];
@@ -312,8 +308,7 @@ class GlueVM {
 
     globals[">="] = GlueExternalFunction((vm, stack, args) {
       args = processedArgs(stack, args);
-      if (args.length != 2)
-        throw ">= wasn't given 2 arguments (more specifically, was given ${args.length})";
+      if (args.length != 2) throw ">= wasn't given 2 arguments (more specifically, was given ${args.length})";
 
       final a = args[0];
       final b = args[1];
@@ -327,8 +322,7 @@ class GlueVM {
 
     globals["<="] = GlueExternalFunction((vm, stack, args) {
       args = processedArgs(stack, args);
-      if (args.length != 2)
-        throw "<= wasn't given 2 arguments (more specifically, was given ${args.length})";
+      if (args.length != 2) throw "<= wasn't given 2 arguments (more specifically, was given ${args.length})";
 
       final a = args[0];
       final b = args[1];
@@ -342,8 +336,7 @@ class GlueVM {
 
     globals["!="] = GlueExternalFunction((vm, stack, args) {
       args = processedArgs(stack, args);
-      if (args.length != 2)
-        throw "!= wasn't given 2 arguments (more specifically, was given ${args.length})";
+      if (args.length != 2) throw "!= wasn't given 2 arguments (more specifically, was given ${args.length})";
 
       final a = args[0];
       final b = args[1];
@@ -373,8 +366,7 @@ class GlueVM {
 
     globals["!"] = GlueExternalFunction((vm, stack, args) {
       args = processedArgs(stack, args);
-      if (args.length != 1)
-        throw "! wasn't given 1 argument (more specifically, was given ${args.length})";
+      if (args.length != 1) throw "! wasn't given 1 argument (more specifically, was given ${args.length})";
 
       final a = args[0];
 
@@ -386,8 +378,7 @@ class GlueVM {
     });
 
     globals["fn"] = GlueExternalFunction((vm, stack, args) {
-      if (args.length != 3)
-        throw "Function definitions need 3 arguments: Name, parameters and body.";
+      if (args.length != 3) throw "Function definitions need 3 arguments: Name, parameters and body.";
 
       final name = args[0];
       final params = args[1];
@@ -410,8 +401,7 @@ class GlueVM {
     });
 
     globals["macro"] = GlueExternalFunction((vm, stack, args) {
-      if (args.length != 2)
-        throw "Macro definitions need 2 arguments: Name and body. (If you need arguments, for obvious reasons, use the @args variable)";
+      if (args.length != 2) throw "Macro definitions need 2 arguments: Name and body. (If you need arguments, for obvious reasons, use the @args variable)";
 
       final name = args[0];
       final body = args[1];
@@ -426,8 +416,7 @@ class GlueVM {
     });
 
     globals["and"] = GlueExternalFunction((vm, stack, args) {
-      if (args.length != 2)
-        throw "and wasn't given 2 arguments (more specifically, was given ${args.length})";
+      if (args.length != 2) throw "and wasn't given 2 arguments (more specifically, was given ${args.length})";
 
       final a = args[0];
       final b = args[1];
@@ -439,8 +428,7 @@ class GlueVM {
     });
 
     globals["or"] = GlueExternalFunction((vm, stack, args) {
-      if (args.length != 2)
-        throw "or wasn't given 2 arguments (more specifically, was given ${args.length})";
+      if (args.length != 2) throw "or wasn't given 2 arguments (more specifically, was given ${args.length})";
 
       final a = args[0];
       final b = args[1];
@@ -452,8 +440,7 @@ class GlueVM {
     });
 
     globals["list-get"] = GlueExternalFunction((vm, stack, args) {
-      if (args.length != 2)
-        throw "list-get wasn't given 2 arguments (more specifically, was given ${args.length})";
+      if (args.length != 2) throw "list-get wasn't given 2 arguments (more specifically, was given ${args.length})";
 
       final list = args[0];
       final i = args[1];
@@ -471,8 +458,7 @@ class GlueVM {
     });
 
     globals["list-set"] = GlueExternalFunction((vm, stack, args) {
-      if (args.length != 3)
-        throw "list-set wasn't given 3 arguments (more specifically, was given ${args.length})";
+      if (args.length != 3) throw "list-set wasn't given 3 arguments (more specifically, was given ${args.length})";
 
       final list = args[0];
       final i = args[1];
@@ -494,8 +480,7 @@ class GlueVM {
     });
 
     globals["list-size"] = GlueExternalFunction((vm, stack, args) {
-      if (args.length != 1)
-        throw "list-size wasn't given 1 argument (more specifically, was given ${args.length})";
+      if (args.length != 1) throw "list-size wasn't given 1 argument (more specifically, was given ${args.length})";
 
       final list = args[0];
 
@@ -505,8 +490,7 @@ class GlueVM {
     });
 
     globals["table-get"] = GlueExternalFunction((vm, stack, args) {
-      if (args.length != 2)
-        throw "list-get wasn't given 2 arguments (more specifically, was given ${args.length})";
+      if (args.length != 2) throw "list-get wasn't given 2 arguments (more specifically, was given ${args.length})";
 
       final table = args[0];
       final i = args[1];
@@ -517,8 +501,7 @@ class GlueVM {
     });
 
     globals["table-set"] = GlueExternalFunction((vm, stack, args) {
-      if (args.length != 3)
-        throw "table-set wasn't given 3 arguments (more specifically, was given ${args.length})";
+      if (args.length != 3) throw "table-set wasn't given 3 arguments (more specifically, was given ${args.length})";
 
       final table = args[0];
       final i = args[1];
@@ -530,8 +513,7 @@ class GlueVM {
     });
 
     globals["table-size"] = GlueExternalFunction((vm, stack, args) {
-      if (args.length != 1)
-        throw "table-size wasn't given 1 argument (more specifically, was given ${args.length})";
+      if (args.length != 1) throw "table-size wasn't given 1 argument (more specifically, was given ${args.length})";
 
       final table = args[0];
 
@@ -541,8 +523,7 @@ class GlueVM {
     });
 
     globals["read-file"] = GlueExternalFunction((vm, stack, args) {
-      if (args.length != 1)
-        throw "read-file wasn't given 1 argument (more specifically, was given ${args.length})";
+      if (args.length != 1) throw "read-file wasn't given 1 argument (more specifically, was given ${args.length})";
 
       final path = glueFixPath(args[0].asString(vm, stack));
 
@@ -555,8 +536,7 @@ class GlueVM {
     });
 
     globals["write-file"] = GlueExternalFunction((vm, stack, args) {
-      if (args.length != 2)
-        throw "write-file wasn't given 2 arguments (more specifically, was given ${args.length})";
+      if (args.length != 2) throw "write-file wasn't given 2 arguments (more specifically, was given ${args.length})";
 
       final path = glueFixPath(args[0].asString(vm, stack));
       final content = args[1].asString(vm, stack);
@@ -568,8 +548,7 @@ class GlueVM {
     });
 
     globals["create-file"] = GlueExternalFunction((vm, stack, args) {
-      if (args.length != 1)
-        throw "create-file wasn't given 1 argument (more specifically, was given ${args.length})";
+      if (args.length != 1) throw "create-file wasn't given 1 argument (more specifically, was given ${args.length})";
 
       final path = glueFixPath(args[0].asString(vm, stack));
 
@@ -580,8 +559,7 @@ class GlueVM {
     });
 
     globals["delete-file"] = GlueExternalFunction((vm, stack, args) {
-      if (args.length != 1)
-        throw "delete-file wasn't given 1 argument (more specifically, was given ${args.length})";
+      if (args.length != 1) throw "delete-file wasn't given 1 argument (more specifically, was given ${args.length})";
 
       final path = glueFixPath(args[0].asString(vm, stack));
 
@@ -592,8 +570,7 @@ class GlueVM {
     });
 
     globals["list-dir"] = GlueExternalFunction((vm, stack, args) {
-      if (args.length != 1)
-        throw "list-dir wasn't given 1 argument (more specifically, was given ${args.length})";
+      if (args.length != 1) throw "list-dir wasn't given 1 argument (more specifically, was given ${args.length})";
 
       final p = glueFixPath(args[0].asString(vm, stack));
 
@@ -615,8 +592,7 @@ class GlueVM {
     });
 
     globals["create-dir"] = GlueExternalFunction((vm, stack, args) {
-      if (args.length != 1)
-        throw "create-dir wasn't given 1 argument (more specifically, was given ${args.length})";
+      if (args.length != 1) throw "create-dir wasn't given 1 argument (more specifically, was given ${args.length})";
 
       final p = glueFixPath(args[0].asString(vm, stack));
 
@@ -627,8 +603,7 @@ class GlueVM {
     });
 
     globals["eval"] = GlueExternalFunction((vm, stack, args) {
-      if (args.length != 1)
-        throw "eval wasn't given 1 argument (more specifically, was given ${args.length})";
+      if (args.length != 1) throw "eval wasn't given 1 argument (more specifically, was given ${args.length})";
 
       final code = args[0].asString(vm, stack);
 
@@ -636,8 +611,7 @@ class GlueVM {
     });
 
     globals["var"] = GlueExternalFunction((vm, stack, args) {
-      if (args.length != 2)
-        throw "var wasn't given 2 arguments (more specifically, was given ${args.length})";
+      if (args.length != 2) throw "var wasn't given 2 arguments (more specifically, was given ${args.length})";
 
       final name = args[0];
       final val = args[1].toValue(vm, stack);
@@ -653,8 +627,7 @@ class GlueVM {
     });
 
     globals["typeof"] = GlueExternalFunction((vm, stack, args) {
-      if (args.length != 1)
-        throw "typeof wasn't given 1 argument (more specifically, was given ${args.length})";
+      if (args.length != 1) throw "typeof wasn't given 1 argument (more specifically, was given ${args.length})";
 
       final val = args.first.toValue(vm, stack);
 
@@ -694,15 +667,13 @@ class GlueVM {
     });
 
     globals["tostring"] = GlueExternalFunction((vm, stack, args) {
-      if (args.length != 1)
-        throw "tostring wasn't given 1 argument (more specifically, was given ${args.length})";
+      if (args.length != 1) throw "tostring wasn't given 1 argument (more specifically, was given ${args.length})";
 
       return GlueString(args[0].asString(vm, stack));
     });
 
     globals["tonumber"] = GlueExternalFunction((vm, stack, args) {
-      if (args.length != 1)
-        throw "tonumber wasn't given 1 argument (more specifically, was given ${args.length})";
+      if (args.length != 1) throw "tonumber wasn't given 1 argument (more specifically, was given ${args.length})";
 
       final str = args[0].asString(vm, stack);
 
@@ -740,8 +711,7 @@ class GlueVM {
     });
 
     globals["math-ceil"] = GlueExternalFunction((vm, stack, args) {
-      if (args.length != 1)
-        throw "math-ceil wasn't given 1 argument (more specifically, was given ${args.length})";
+      if (args.length != 1) throw "math-ceil wasn't given 1 argument (more specifically, was given ${args.length})";
 
       final p = args[0].toValue(vm, stack);
 
@@ -773,6 +743,21 @@ class GlueVM {
       final name = args[0].asString(vm, stack);
 
       return stack.read(name) ?? vm.globals[name] ?? GlueNull();
+    });
+
+    globals["global"] = GlueExternalFunction((vm, stack, args) {
+      if (args.length != 2) {
+        throw "global wasn't given 2 arguments (more specifically, was given ${args.length})";
+      }
+
+      final name = args[0];
+      final val = args[1].toValue(vm, stack);
+
+      if (name is! GlueVariable) throw "global must be a variable name";
+
+      vm.globals[name.varname] = val;
+
+      return val;
     });
   }
 
