@@ -413,6 +413,29 @@ class GlueVM {
       return func;
     });
 
+    globals["global-fn"] = GlueExternalFunction((vm, stack, args) {
+      if (args.length != 3) throw "Global Function definitions need 3 arguments: Name, parameters and body.";
+
+      final name = args[0];
+      final params = args[1];
+      final body = args[2];
+
+      if (name is! GlueVariable) throw "Global Function name must be a variable.";
+      if (params is! GlueList) throw "Parameters must be list expression.";
+
+      final a = <String>[];
+
+      for (var param in params.vals) {
+        if (param is GlueVariable) a.add(param.varname);
+      }
+
+      final func = GlueFunction(a, body);
+
+      vm.globals[name.varname] = func;
+
+      return func;
+    });
+
     globals["macro"] = GlueExternalFunction((vm, stack, args) {
       if (args.length != 2) throw "Macro definitions need 2 arguments: Name and body. (If you need arguments, for obvious reasons, use the @args variable)";
 
@@ -424,6 +447,21 @@ class GlueVM {
       final macro = GlueMacro(body);
 
       stack.push(name.varname, macro);
+
+      return macro;
+    });
+
+    globals["global-macro"] = GlueExternalFunction((vm, stack, args) {
+      if (args.length != 2) throw "Global Macro definitions need 2 arguments: Name and body. (If you need arguments, for obvious reasons, use the @args variable)";
+
+      final name = args[0];
+      final body = args[1];
+
+      if (name is! GlueVariable) throw "Global Macro name must be a variable.";
+
+      final macro = GlueMacro(body);
+
+      vm.globals[name.varname] = macro;
 
       return macro;
     });
@@ -855,8 +893,6 @@ class GlueVM {
         throw "while wasn't given 2 arguments (more specifically, was given ${args.length})";
       }
 
-      stack.save();
-
       GlueValue last = GlueNull();
 
       final condition = args[0];
@@ -868,8 +904,6 @@ class GlueVM {
         if (!result.b) break;
         last = body.toValue(vm, stack);
       }
-
-      stack.restore();
 
       return last;
     });
