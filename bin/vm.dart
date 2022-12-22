@@ -390,6 +390,23 @@ class GlueVM {
       return GlueBool(false);
     });
 
+    globals["lambda"] = GlueExternalFunction((vm, stack, args) {
+      if (args.length != 2) throw "Lambda definitions need 3 arguments: Name, parameters and body.";
+
+      final params = args[0];
+      final body = args[1];
+
+      if (params is! GlueList) throw "Parameters must be list expression.";
+
+      final a = <String>[];
+
+      for (var param in params.vals) {
+        if (param is GlueVariable) a.add(param.varname);
+      }
+
+      return GlueFunction(a, body);
+    });
+
     globals["fn"] = GlueExternalFunction((vm, stack, args) {
       if (args.length != 3) throw "Function definitions need 3 arguments: Name, parameters and body.";
 

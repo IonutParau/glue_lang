@@ -167,6 +167,9 @@ abstract class GlueValue {
 
   static GlueValue fromString(String str) {
     str = glueFixStr(str);
+    final parts = glueSeperate(str);
+    if (parts.isEmpty) return GlueNull();
+    if (parts.length > 1) return fromString('($str)');
     if (double.tryParse(str) != null) return GlueNumber(double.parse(str));
     if (str == "true" || str == "false") return GlueBool(str == "true");
     if (str.startsWith('"') && str.endsWith('"')) {
