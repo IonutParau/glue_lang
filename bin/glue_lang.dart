@@ -1,5 +1,7 @@
+import 'dart:convert';
 import 'dart:io';
 
+import 'values/values.dart';
 import 'vm.dart';
 
 void repl() {
@@ -18,5 +20,37 @@ void repl() {
 }
 
 void main(List<String> arguments) {
-  repl();
+  if (arguments.isEmpty) repl();
+
+  final filename = arguments[0];
+
+  if (filename == "parse") {
+    if (arguments.length >= 2) {
+      final file = File(arguments[1]);
+
+      if (!file.existsSync()) {
+        return print("Error: File \"${arguments[1]}\" does not exist");
+      }
+
+      print(
+        jsonEncode(
+          glueSendAsExpressionJSON(
+            GlueValue.fromString(file.readAsStringSync()),
+          ),
+        ),
+      );
+    } else {
+      print("Usage: glue parse <filename>");
+    }
+  } else {
+    final file = File(filename);
+
+    if (!file.existsSync()) {
+      return print("Error: File \"$filename\" does not exist");
+    }
+
+    final vm = GlueVM();
+    vm.loadStandard();
+    vm.evaluate(file.readAsStringSync());
+  }
 }

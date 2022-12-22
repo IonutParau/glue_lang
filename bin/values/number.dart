@@ -16,5 +16,13 @@ class GlueNumber extends GlueValue {
   }
 
   @override
-  String asString(GlueVM vm, GlueStack stack) => '$n';
+  String asString(GlueVM vm, GlueStack stack) {
+    var str = '$n';
+
+    while (str.endsWith('.0')) {
+      str = str.substring(0, str.length - 2);
+    }
+
+    return str;
+  }
 }

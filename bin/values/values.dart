@@ -1,5 +1,7 @@
 library glue_values;
 
+import 'dart:convert';
+
 import '../vm.dart';
 
 part 'null.dart';
@@ -18,7 +20,7 @@ List<String> glueSeperate(String str) {
   final openers = ['(', '[', '{'];
   final closers = [')', ']', '}'];
   final seperators = ['\n', ' ', '\t'];
-  final l = <String>[""];
+  var l = <String>[""];
 
   final chars = str.split('');
   var inString = false;
@@ -57,6 +59,7 @@ List<String> glueSeperate(String str) {
     l.last += char;
   }
 
+  l = l.map((str) => str.trim()).toList();
   l.removeWhere((e) => e == "");
 
   return l;
@@ -73,7 +76,7 @@ String glueFixStr(String str) {
     s = s.substring(0, s.length - 1);
   }
 
-  return s;
+  return s.trim();
 }
 
 abstract class GlueValue {
@@ -92,8 +95,12 @@ abstract class GlueValue {
     str = glueFixStr(str);
     if (double.tryParse(str) != null) return GlueNumber(double.parse(str));
     if (str == "true" || str == "false") return GlueBool(str == "true");
-    if (str.startsWith('"') && str.endsWith('"')) return GlueString(str.substring(1, str.length - 1));
-    if (str.startsWith('`') && str.endsWith('`')) return GlueRegex(RegExp(str.substring(1, str.length - 1)));
+    if (str.startsWith('"') && str.endsWith('"')) {
+      return GlueString(str.substring(1, str.length - 1));
+    }
+    if (str.startsWith('`') && str.endsWith('`')) {
+      return GlueRegex(RegExp(str.substring(1, str.length - 1)));
+    }
     if (str.startsWith('(') && str.endsWith(')')) {
       final parts = glueSeperate(str.substring(1, str.length - 1));
       if (parts.isEmpty) return GlueNull();
@@ -130,5 +137,64 @@ abstract class GlueValue {
     }
 
     return GlueVariable(str);
+  }
+}
+
+dynamic glueSendAsExpressionJSON(GlueValue val) {
+  if (val is GlueNull) {
+    return {"type": "null"};
+  } else if (val is GlueBool) {
+    return {"type": "bool", "val": val.b};
+  } else if (val is GlueFunction) {
+    return {
+      "type": "function",
+      "args": val.args.cast<dynamic>(),
+      "body": glueSendAsExpressionJSON(val.body),
+    };
+  } else if (val is GlueExternalFunction) {
+    return {
+      "type": "external-function",
+    };
+  } else if (val is GlueList) {
+    return {
+      "type": "list",
+      "vals": val.vals.map(glueSendAsExpressionJSON).toList()
+    };
+  } else if (val is GlueTable) {
+    return {
+      "type": "table",
+      "vals": val.val.map<String, dynamic>((key, value) {
+        return MapEntry(
+          jsonEncode(glueSendAsExpressionJSON(key)),
+          glueSendAsExpressionJSON(val),
+        );
+      })
+    };
+  } else if (val is GlueString) {
+    return {
+      "type": "string",
+      "str": val.str,
+    };
+  } else if (val is GlueRegex) {
+    return {
+      "type": "regex",
+      "str": val.str.pattern,
+    };
+  } else if (val is GlueMacro) {
+    return {
+      "type": "macro",
+      "str": glueSendAsExpressionJSON(val.macro),
+    };
+  } else if (val is GlueNumber) {
+    return {
+      "type": "number",
+      "str": val.n,
+    };
+  } else if (val is GlueExpression) {
+    return {
+      "type": "s-expression",
+      "op": glueSendAsExpressionJSON(val.operation),
+      "args": val.args.map(glueSendAsExpressionJSON).toList(),
+    };
   }
 }
