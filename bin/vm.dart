@@ -93,8 +93,9 @@ class GlueVM {
     });
 
     globals["if-else"] = GlueExternalFunction((vm, stack, args) {
-      if (args.length != 3)
+      if (args.length != 3) {
         throw "if-else wasn't given 3 arguments (more specifically, was given ${args.length})";
+      }
 
       final condition = args[0].toValue(vm, stack);
       final body = args[1];
@@ -108,8 +109,9 @@ class GlueVM {
     });
 
     globals["unless"] = GlueExternalFunction((vm, stack, args) {
-      if (args.length != 2)
+      if (args.length != 2) {
         throw "if wasn't given 2 arguments (more specifically, was given ${args.length})";
+      }
 
       final condition = args[0].toValue(vm, stack);
       final body = args[1];
@@ -760,6 +762,17 @@ class GlueVM {
         return GlueNumber(p.n.roundToDouble());
       }
       return GlueNull();
+    });
+
+    globals["read-var"] = GlueExternalFunction((vm, stack, args) {
+      args = processedArgs(stack, args);
+      if (args.length != 1) {
+        throw "read-var wasn't given 1 argument (more specifically, was given ${args.length})";
+      }
+
+      final name = args[0].asString(vm, stack);
+
+      return stack.read(name) ?? vm.globals[name] ?? GlueNull();
     });
   }
 
