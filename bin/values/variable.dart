@@ -7,7 +7,7 @@ class GlueVariable extends GlueValue {
 
   @override
   GlueValue toValue(GlueVM vm, GlueStack stack) {
-    return stack.read(varname) ?? vm.globals[varname] ?? GlueNull();
+    return (stack.read(varname) ?? vm.globals[varname] ?? GlueNull()).toValue(vm, stack);
   }
 
   @override

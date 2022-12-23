@@ -182,6 +182,10 @@ class GlueVM {
         return GlueString(a.str.replaceFirst(b.str, ''));
       }
 
+      if (a is GlueString && b is GlueRegex) {
+        return GlueString(a.str.replaceFirst(b.str, ''));
+      }
+
       if (a is GlueRegex && b is GlueRegex) {
         return GlueRegex(RegExp(a.str.pattern.replaceFirst(b.str.pattern, '')));
       }
@@ -288,6 +292,10 @@ class GlueVM {
         return GlueBool(b.str.hasMatch(a.str));
       }
 
+      if (a is GlueNull) {
+        return GlueBool(b is GlueNull);
+      }
+
       return GlueBool(a == b);
     });
 
@@ -372,6 +380,10 @@ class GlueVM {
 
       if (a is GlueString && b is GlueRegex) {
         return GlueBool(!b.str.hasMatch(a.str));
+      }
+
+      if (a is GlueNull) {
+        return GlueBool(b is! GlueNull);
       }
 
       return GlueBool(false);

@@ -317,6 +317,10 @@ String glueDisassemble(GlueValue val) {
         str += r"\\";
       } else if (char == "`") {
         str += r'\`';
+      } else if (char == "\n") {
+        str += r'\n';
+      } else if (char == "\t") {
+        str += r'\t';
       } else {
         str += char;
       }
