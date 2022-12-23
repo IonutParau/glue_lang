@@ -158,11 +158,11 @@ Like `*`, but divides. Still only works on numbers.
 
 ## %
 
-Like `%`, but gives the remainder. Still only works on numbers.
+Like `/`, but gives the remainder. Still only works on numbers.
 
 ## ^
 
-Like `^`, but raises the first argument to the 2nd. Still only works on numbers.
+Like `*`, but raises the first argument to the 2nd. Still only works on numbers.
 
 ## =
 
