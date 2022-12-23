@@ -15,9 +15,17 @@ void repl() {
     stdout.write('> ');
     final code = stdin.readLineSync()!;
 
-    final res = vm.evaluate(code, stack);
+    final stopwatch = Stopwatch()..start();
+    GlueValue res = GlueNull();
+    try {
+      res = vm.evaluate(code, stack);
+      print("Result: ${res.asString(vm, stack)}");
+    } catch (e) {
+      print("Error: $e");
+    }
+    stopwatch.stop();
 
-    print("Result: ${res.asString(vm, stack)}");
+    print("Took: ${stopwatch.elapsedMilliseconds}ms");
   }
 }
 

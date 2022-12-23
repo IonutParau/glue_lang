@@ -975,6 +975,36 @@ class GlueVM {
 
       return last;
     });
+
+    globals["disassemble"] = GlueExternalFunction((vm, stack, args) {
+      args = processedArgs(stack, args);
+      if (args.length != 1) {
+        throw "disassemble wasn't given 1 argument (more specifically, was given ${args.length})";
+      }
+
+      return GlueString(glueDisassemble(args[0]));
+    });
+
+    globals["to-macro"] = GlueExternalFunction((vm, stack, args) {
+      return GlueList(args.map((v) => v.forMacros()).toList());
+    });
+
+    globals["to-macro-processed"] = GlueExternalFunction((vm, stack, args) {
+      args = processedArgs(stack, args);
+      return GlueList(args.map((v) => v.forMacros()).toList());
+    });
+
+    globals["disassemble-ast"] = GlueExternalFunction((vm, stack, args) {
+      args = processedArgs(stack, args);
+
+      return GlueList(args.map(GlueValue.fromMacro).toList()).toValue(vm, stack);
+    });
+
+    globals["disassemble-ast-code"] = GlueExternalFunction((vm, stack, args) {
+      args = processedArgs(stack, args);
+
+      return GlueList(args.map(GlueValue.fromMacro).toList());
+    });
   }
 
   GlueValue evaluate(String str, [GlueStack? vmStack]) {

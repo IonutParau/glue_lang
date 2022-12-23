@@ -272,3 +272,66 @@ dynamic glueSendAsExpressionJSON(GlueValue val) {
     };
   }
 }
+
+String glueDisassemble(GlueValue val) {
+  if (val is GlueVariable) {
+    return val.varname;
+  } else if (val is GlueNull) {
+    return "null";
+  } else if (val is GlueBool) {
+    return val.b ? "true" : "false";
+  } else if (val is GlueString) {
+    var str = "";
+    var chars = val.str.split('');
+
+    for (var char in chars) {
+      if (char == "\\") {
+        str += r"\\";
+      } else if (char == "\"") {
+        str += r'\"';
+      } else {
+        str += char;
+      }
+    }
+
+    return '"$str"';
+  } else if (val is GlueNumber) {
+    return '${val.n}';
+  } else if (val is GlueList) {
+    return '[${val.vals.map(glueDisassemble).join(" ")}]';
+  } else if (val is GlueTable) {
+    final strs = <String>[];
+
+    val.val.forEach((key, value) {
+      strs.add(glueDisassemble(key));
+      strs.add(glueDisassemble(value));
+    });
+
+    return '{${strs.join(" ")}}';
+  } else if (val is GlueRegex) {
+    var str = "";
+    var chars = val.str.pattern.split('');
+
+    for (var char in chars) {
+      if (char == "\\") {
+        str += r"\\";
+      } else if (char == "`") {
+        str += r'\`';
+      } else {
+        str += char;
+      }
+    }
+
+    return '"$str"';
+  } else if (val is GlueExternalFunction) {
+    return '<external function>';
+  } else if (val is GlueFunction) {
+    return '(lambda [${val.args.join(" ")}] ${glueDisassemble(val.body)})';
+  } else if (val is GlueMacro) {
+    return '(macro <unknown> ${glueDisassemble(val.macro)})';
+  } else if (val is GlueExpression) {
+    return '(${glueDisassemble(val.operation)} ${val.args.map(glueDisassemble).join(" ")})';
+  }
+
+  return "";
+}
