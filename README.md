@@ -13,4 +13,4 @@ And also has:
 
 # Docs
 
-Docs available <a href="https://github.com/IonutParau/glue_lang/blob/main/LICENSE">here</a>
+Docs available <a href="https://github.com/IonutParau/glue_lang/blob/main/DOCS.md">here</a>
