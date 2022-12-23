@@ -1063,6 +1063,19 @@ class GlueVM {
 
       return GlueList(args.map(GlueValue.fromMacro).toList());
     });
+
+    globals["str-split"] = GlueExternalFunction((vm, stack, args) {
+      args = processedArgs(stack, args);
+      if (args.length != 2) {
+        throw "str-split wasn't given 2 arguments (more specifically, it was given ${args.length})";
+      }
+
+      final str = args[0].asString(vm, stack);
+      final other = args[1];
+      final sep = other is GlueRegex ? other.str : other.asString(vm, stack);
+
+      return GlueList(str.split(sep).map((e) => GlueString(e)).toList());
+    });
   }
 
   GlueValue evaluate(String str, [GlueStack? vmStack]) {
