@@ -14,7 +14,7 @@ class GlueStackVar {
 class GlueStack {
   final List<GlueStackVar> _stack = [];
 
-  int? old;
+  final List<int> _old = [];
 
   void push(String name, GlueValue val) {
     _stack.add(GlueStackVar(name, val));
@@ -25,12 +25,12 @@ class GlueStack {
   }
 
   void save() {
-    old = _stack.length;
+    _old.add(_stack.length);
   }
 
   void restore() {
-    if (old == null) return;
-    while (_stack.length > old!) {
+    if (_old.isEmpty) return;
+    while (_stack.length > _old.last) {
       _stack.removeLast();
     }
   }
@@ -403,7 +403,7 @@ class GlueVM {
     });
 
     globals["lambda"] = GlueExternalFunction((vm, stack, args) {
-      if (args.length != 2) throw "Lambda definitions need 3 arguments: Name, parameters and body.";
+      if (args.length != 2) throw "Lambda definitions need 2 arguments: Parameters and body.";
 
       final params = args[0];
       final body = args[1];
@@ -547,16 +547,19 @@ class GlueVM {
       final i = args[1];
       final v = args[2];
 
-      if (list is! GlueList) return GlueNull();
-      if (i is! GlueNumber) return GlueNull();
+      if (list is! GlueList) return list;
+      if (i is! GlueNumber) return list;
 
-      if (i.n.isInfinite || i.n.isNaN || i.n.isNegative) return GlueNull();
+      if (i.n.isInfinite || i.n.isNaN || i.n.isNegative) return list;
 
       var idx = i.n.toInt();
 
-      if (idx >= list.vals.length) return GlueNull();
-
       final l = [...list.vals];
+
+      while (l.length < (idx + 1)) {
+        l.add(GlueNull());
+      }
+
       l[idx] = v;
 
       return GlueList(l);
@@ -573,16 +576,38 @@ class GlueVM {
       return GlueNumber(list.vals.length.toDouble());
     });
 
+    globals["list-remote-at"] = GlueExternalFunction((vm, stack, args) {
+      args = processedArgs(stack, args);
+      if (args.length != 2) throw "list-remote-at wasn't given 2 arguments (more specifically, was given ${args.length})";
+
+      final list = args[0];
+      final i = args[1];
+
+      if (list is! GlueList) return list;
+      if (i is! GlueNumber) return list;
+
+      if (i.n.isInfinite || i.n.isNaN || i.n.isNegative) return list;
+
+      final idx = i.n.toInt();
+      if (idx >= list.vals.length) return list;
+
+      final v = [...list.vals];
+
+      v.removeAt(idx);
+
+      return GlueList(v);
+    });
+
     globals["table-get"] = GlueExternalFunction((vm, stack, args) {
       args = processedArgs(stack, args);
-      if (args.length != 2) throw "list-get wasn't given 2 arguments (more specifically, was given ${args.length})";
+      if (args.length != 2) throw "table-get wasn't given 2 arguments (more specifically, was given ${args.length})";
 
       final table = args[0];
       final i = args[1];
 
       if (table is! GlueTable) return GlueNull();
 
-      return table.read(vm, i);
+      return table.read(vm, stack, i);
     });
 
     globals["table-set"] = GlueExternalFunction((vm, stack, args) {
@@ -595,7 +620,7 @@ class GlueVM {
 
       if (table is! GlueTable) return GlueNull();
 
-      return table.write(vm, i, v);
+      return table.write(vm, stack, i, v);
     });
 
     globals["table-size"] = GlueExternalFunction((vm, stack, args) {
@@ -656,6 +681,16 @@ class GlueVM {
       return GlueNull();
     });
 
+    globals["file-exists"] = GlueExternalFunction((vm, stack, args) {
+      if (args.length != 1) throw "file-exists wasn't given 1 argument (more specifically, was given ${args.length})";
+
+      final path = glueFixPath(args[0].asString(vm, stack));
+
+      final f = File(path);
+
+      return GlueBool(f.existsSync());
+    });
+
     globals["list-dir"] = GlueExternalFunction((vm, stack, args) {
       if (args.length != 1) throw "list-dir wasn't given 1 argument (more specifically, was given ${args.length})";
 
@@ -685,6 +720,17 @@ class GlueVM {
 
       final f = Directory(p);
       f.createSync();
+
+      return GlueNull();
+    });
+
+    globals["delete-dir"] = GlueExternalFunction((vm, stack, args) {
+      if (args.length != 1) throw "delete-dir wasn't given 1 argument (more specifically, was given ${args.length})";
+
+      final p = glueFixPath(args[0].asString(vm, stack));
+
+      final f = Directory(p);
+      if (f.existsSync()) f.deleteSync();
 
       return GlueNull();
     });
@@ -997,13 +1043,13 @@ class GlueVM {
       return GlueString(glueDisassemble(args[0]));
     });
 
-    globals["to-macro"] = GlueExternalFunction((vm, stack, args) {
-      return GlueList(args.map((v) => v.forMacros()).toList());
-    });
-
-    globals["to-macro-processed"] = GlueExternalFunction((vm, stack, args) {
+    globals["disassemble-code"] = GlueExternalFunction((vm, stack, args) {
       args = processedArgs(stack, args);
-      return GlueList(args.map((v) => v.forMacros()).toList());
+      if (args.length != 1) {
+        throw "disassemble-code wasn't given 1 argument (more specifically, was given ${args.length})";
+      }
+
+      return GlueString(glueDisassemble(GlueValue.fromMacro(args[0])));
     });
 
     globals["disassemble-ast"] = GlueExternalFunction((vm, stack, args) {

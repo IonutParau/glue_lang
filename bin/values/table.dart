@@ -17,14 +17,14 @@ class GlueTable extends GlueValue {
     );
   }
 
-  GlueValue read(GlueVM vm, GlueValue field) {
+  GlueValue read(GlueVM vm, GlueStack stack, GlueValue field) {
     final pairs = val.entries.toList();
 
     for (var pair in pairs) {
       final key = pair.key;
       final value = pair.value;
 
-      if (key.asString(vm, GlueStack()) == field.asString(vm, GlueStack())) {
+      if (key.asString(vm, stack) == field.asString(vm, stack)) {
         return value;
       }
     }
@@ -32,14 +32,18 @@ class GlueTable extends GlueValue {
     return GlueNull();
   }
 
-  GlueTable write(GlueVM vm, GlueValue field, GlueValue value) {
+  GlueTable write(GlueVM vm, GlueStack stack, GlueValue field, GlueValue value) {
     final table = GlueTable({...val});
     final pairs = val.entries.toList();
 
     for (var pair in pairs) {
       final key = pair.key;
 
-      if (key.asString(vm, GlueStack()) == field.asString(vm, GlueStack())) {
+      if (key.asString(vm, stack) == field.asString(vm, stack)) {
+        if (value is GlueNull) {
+          table.val.remove(key);
+          break;
+        }
         table.val[key] = value;
         break;
       }
