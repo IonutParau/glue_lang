@@ -16,7 +16,26 @@ part 'macro.dart';
 part 'function.dart';
 part 'variable.dart';
 
+String glueUncomment(String str) {
+  final lines = str.split('\n');
+  final uncommented = [];
+
+  for (var line in lines) {
+    final ci = line.indexOf(';');
+
+    if (ci == -1) {
+      uncommented.add(line);
+    } else {
+      uncommented.add(line.substring(0, ci));
+    }
+  }
+
+  return uncommented.join("\n");
+}
+
 List<String> glueSeperate(String str) {
+  str = glueUncomment(str);
+
   final openers = ['(', '[', '{'];
   final closers = [')', ']', '}'];
   final seperators = ['\n', ' ', '\t'];
@@ -66,7 +85,7 @@ List<String> glueSeperate(String str) {
 }
 
 String glueFixStr(String str) {
-  var s = str;
+  var s = glueUncomment(str);
 
   while (s.startsWith(' ') || s.startsWith('\n') || s.startsWith('\t')) {
     s = s.substring(1);

@@ -1,1 +1,2 @@
+; A simple call to print.
 (print "Hello, world!")
