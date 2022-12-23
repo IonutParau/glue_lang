@@ -36,17 +36,27 @@ class GlueTable extends GlueValue {
     final table = GlueTable({...val});
     final pairs = val.entries.toList();
 
+    var done = false;
+
     for (var pair in pairs) {
       final key = pair.key;
 
-      if (key.asString(vm, stack) == field.asString(vm, stack)) {
+      final keystr = key.asString(vm, stack);
+      final fieldstr = field.asString(vm, stack);
+      if (keystr == fieldstr) {
         if (value is GlueNull) {
           table.val.remove(key);
+          done = true;
           break;
         }
         table.val[key] = value;
+        done = true;
         break;
       }
+    }
+
+    if (!done) {
+      table.val[field] = value;
     }
 
     return table;

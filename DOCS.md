@@ -480,6 +480,8 @@ The above behavior can also be exploited to get information about a function's c
 For example, it can be used to get a value of one of its locals by setting a global to it.
 This is a fun little side-effect of `disassemble-ast-code`.
 
+Please note: The behavior can be counter-intuitive. This behavior is left to the internals of the interpreter, which means this behavior may also not be standard if someone makes another interpreter with a different way of internally handling things.
+
 ## str-split
 
 Takes a string and a seperator.

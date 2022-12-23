@@ -1012,21 +1012,17 @@ class GlueVM {
       if (val is GlueList) {
         var i = 0;
         for (var v in val.vals) {
-          stack.save();
           stack.push(varNames[0], GlueNumber(i.toDouble()));
           stack.push(varNames[1], v);
           last = body.toValue(vm, stack);
-          stack.restore();
           i++;
         }
       } else if (val is GlueTable) {
         val.val.forEach(
           (key, value) {
-            stack.save();
             stack.push(varNames[0], key.toValue(vm, stack));
             stack.push(varNames[1], value.toValue(vm, stack));
             last = body.toValue(vm, stack);
-            stack.restore();
           },
         );
       }
@@ -1056,6 +1052,12 @@ class GlueVM {
       args = processedArgs(stack, args);
 
       return GlueList(args.map(GlueValue.fromMacro).toList()).toValue(vm, stack);
+    });
+
+    globals["disassemble-ast-str"] = GlueExternalFunction((vm, stack, args) {
+      args = processedArgs(stack, args);
+
+      return GlueString(glueDisassemble(GlueList(args.map(GlueValue.fromMacro).toList())));
     });
 
     globals["disassemble-ast-code"] = GlueExternalFunction((vm, stack, args) {

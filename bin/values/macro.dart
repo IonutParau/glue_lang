@@ -9,11 +9,13 @@ class GlueMacro extends GlueValue {
   // then return value from AST.
   @override
   GlueValue invoke(GlueVM vm, GlueStack stack, List<GlueValue> args) {
+    final macroStack = GlueStack();
+
     // Push Abstract Syntax Tree
-    stack.push("@args", GlueList(args.map((e) => e.forMacros()).toList()));
+    macroStack.push("@args", GlueList(args.map((e) => e.forMacros()).toList()));
 
     // Get the new Abstract Syntax Tree
-    final newAST = macro.toValue(vm, GlueStack());
+    final newAST = macro.toValue(vm, macroStack);
 
     return GlueValue.fromMacro(newAST).toValue(vm, stack);
   }

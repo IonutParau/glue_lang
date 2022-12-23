@@ -25,7 +25,7 @@ void repl() {
     }
     stopwatch.stop();
 
-    print("Took: ${stopwatch.elapsedMilliseconds}ms");
+    print("Took: ${stopwatch.elapsedMicroseconds / 1000}ms");
   }
 }
 

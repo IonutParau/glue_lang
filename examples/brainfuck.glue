@@ -1,0 +1,35 @@
+(global code (str-split ">+.,-." ""))
+(global pointer 0)
+(global memory [0 0 0 0 0])
+(global curchar -1)
+(global depth 0)
+
+(global-fn readchar [char] (
+  (if (= char ">") (global pointer (+ pointer 1)))
+  (if (= char "<") (global pointer (- pointer 1)))
+  (if (= char "+") (global memory (list-set memory pointer (+ (list-get memory pointer) 1))))
+  (if (= char "-") (global memory (list-set memory pointer (- (list-get memory pointer) 1))))
+  (if (= char ",") (global memory (list-set memory pointer (ascii (read)))))
+  (if (= char ".") (write (ascii (list-get memory pointer))))
+))
+
+(global-fn readcode [] (
+  (while (< curchar (list-size code)) (
+    (global curchar (+ curchar 1))
+
+    (readchar (list-get code curchar))
+    (if (= (list-get code curchar) "[") (if-else (!= (list-get memory pointer) 0) ((global depth (+ depth 1))) (while (and (!= (list-get code curchar) "]") (> 0 depth)) (
+      (global curchar (+ curchar 1))
+      (if (and (= (list-get code curchar "]")) (> 0 depth)) (global depth (- depth 1))))))
+    )
+    (if (= (list-get code curchar) "]") (if-else (!= (list-get memory pointer) 0) (while (and (!= (list-get code curchar) "[") (> 0 depth)) (
+      (global curchar (- curchar 1))))
+      (if (and (= (list-get code curchar "[")) (> 0 depth)) (global depth (- depth 1))))
+    )
+  ))
+))
+
+(global-fn runcode [codeToRun] (
+  (global code (str-split codeToRun ""))
+  (readcode)
+))
