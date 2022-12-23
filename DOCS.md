@@ -479,3 +479,11 @@ This can also cause this weird behavior:
 The above behavior can also be exploited to get information about a function's context.
 For example, it can be used to get a value of one of its locals by setting a global to it.
 This is a fun little side-effect of `disassemble-ast-code`.
+
+## str-split
+
+Takes a string and a seperator.
+If the seperator is a RegEx, it splits it into matches.
+If the seperator is something else, it stringifies it and then splits it by that.
+
+Returns a list of the split parts.
