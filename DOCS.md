@@ -487,3 +487,7 @@ If the seperator is a RegEx, it splits it into matches.
 If the seperator is something else, it stringifies it and then splits it by that.
 
 Returns a list of the split parts.
+
+## str-len
+
+Takes a string and just returns its length.
