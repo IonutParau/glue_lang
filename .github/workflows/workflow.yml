@@ -1,0 +1,27 @@
+on: push
+
+jobs:
+  build_windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: DanTup/gh-actions/setup-dart@master
+      - run: dart pub get
+      - run: mkdir build
+      - run: dart compile exe bin/glue_lang.dart -v -o "build/glue.exe"
+  build_linux:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: DanTup/gh-actions/setup-dart@master
+      - run: dart pub get
+      - run: mkdir build
+      - run: dart compile exe bin/glue_lang.dart -v -o "build/glue"
+  build_windows:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: DanTup/gh-actions/setup-dart@master
+      - run: dart pub get
+      - run: mkdir build
+      - run: dart compile exe bin/glue_lang.dart -v -o "build/glue"
