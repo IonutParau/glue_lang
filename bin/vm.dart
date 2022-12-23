@@ -1112,6 +1112,24 @@ class GlueVM {
 
       return GlueNull();
     });
+
+    globals["field"] = GlueMacro(GlueValue.fromString('''(if-else (= (list-size @args) 3)
+    ["expression" ["var" "table-set"] [(list-get @args 0) ["string" (list-get (list-get @args 1) 1)] (list-get @args 2)]]
+    ["expression" ["var" "table-get"] [(list-get @args 0) ["string" (list-get (list-get @args 1) 1)]]]
+  )'''));
+
+    globals["struct"] = GlueMacro(GlueValue.fromString('''(var structName (list-get @args 0))
+  (var structParts (list-get @args 1))
+
+  (var structFuncBody {})
+
+  (var structArgs (list-get structParts 1))
+
+  (for-each structArgs [i field] (
+    (var structFuncBody (table-set structFuncBody ["string" (list-get field 1)] field))
+  ))
+
+  ["expression" ["var" "global-fn"] [structName structParts ["table" structFuncBody]]]'''));
   }
 
   GlueValue evaluate(String str, [GlueStack? vmStack]) {

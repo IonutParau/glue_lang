@@ -39,7 +39,7 @@ true ; A boolean (there is also false).
 
 # The standard library
 
-A set of external functions that you can use to make your program work.
+A set of external functions and macros that you can use to make your program work.
 
 ## print
 
@@ -499,3 +499,25 @@ Takes a string and just returns its length.
 Takes one argument. If it is a string (and is not empty), returns the ASCII code of the first character.
 If it is a number, returns the ASCII character of the number.
 If it is an invalid value, returns null.
+
+## struct
+
+A macro. Takes a variable name, and list of fields, and automatically generates a constructor.
+
+Usage:
+
+```lisp
+(struct MyStruct [x y z])
+(print (MyStruct 506 23890 "Epic")) ; Prints {x: 506, y: 23890, z: Epic}
+```
+
+## field
+
+A macro. Can read from or write to a field from a table (or struct) by name.
+
+Usage:
+
+```lisp
+(print (field {"x" 50} x)) ; Prints 50
+(print (field {"x" 50} x 2000)) ; Prints {x: 2000}
+```
