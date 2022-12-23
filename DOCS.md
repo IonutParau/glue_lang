@@ -521,3 +521,13 @@ Usage:
 (print (field {"x" 50} x)) ; Prints 50
 (print (field {"x" 50} x 2000)) ; Prints {x: 2000}
 ```
+
+## str-at
+
+A macro. It will split a string by `""`, then index it.
+
+```lisp
+(print (str-at "Test" 3)) ; Prints s
+; Equivalent to
+(print (list-get (str-split "Test" "") 3)) ; which also prints s
+```

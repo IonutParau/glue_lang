@@ -1131,7 +1131,7 @@ class GlueVM {
 
   ["expression" ["var" "global-fn"] [structName structParts ["table" structFuncBody]]]'''));
 
-    globals["str-sub"] = GlueMacro(GlueValue.fromString(r'["expression" ["var" "list-get"] [["expression" ["var" "str-split"] [(list-get @args 0) ["string" ""]]] (list-get @args 1)]]'));
+    globals["str-at"] = GlueMacro(GlueValue.fromString(r'["expression" ["var" "list-get"] [["expression" ["var" "str-split"] [(list-get @args 0) ["string" ""]]] (list-get @args 1)]]'));
   }
 
   GlueValue evaluate(String str, [GlueStack? vmStack]) {
