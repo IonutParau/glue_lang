@@ -1076,6 +1076,17 @@ class GlueVM {
 
       return GlueList(str.split(sep).map((e) => GlueString(e)).toList());
     });
+
+    globals["str-len"] = GlueExternalFunction((vm, stack, args) {
+      args = processedArgs(stack, args);
+      if (args.length != 1) {
+        throw "str-len wasn't given 1 argument (more specifically, it was given ${args.length})";
+      }
+
+      final str = args[0].asString(vm, stack);
+
+      return GlueNumber(str.length.toDouble());
+    });
   }
 
   GlueValue evaluate(String str, [GlueStack? vmStack]) {
