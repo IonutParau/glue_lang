@@ -491,3 +491,9 @@ Returns a list of the split parts.
 ## str-len
 
 Takes a string and just returns its length.
+
+## ascii
+
+Takes one argument. If it is a string (and is not empty), returns the ASCII code of the first character.
+If it is a number, returns the ASCII character of the number.
+If it is an invalid value, returns null.

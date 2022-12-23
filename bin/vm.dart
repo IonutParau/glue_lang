@@ -1087,6 +1087,29 @@ class GlueVM {
 
       return GlueNumber(str.length.toDouble());
     });
+
+    globals["ascii"] = GlueExternalFunction((vm, stack, args) {
+      args = processedArgs(stack, args);
+      if (args.length != 1) {
+        throw "ascii wasn't given 1 argument (more specifically, it was given ${args.length})";
+      }
+
+      final val = args[0];
+
+      if (val is GlueString) {
+        if (val.str.isEmpty) return GlueNull();
+        return GlueNumber(val.str.codeUnits.first.toDouble());
+      }
+
+      if (val is GlueNumber) {
+        if (val.n.isNaN) return GlueNull();
+        if (val.n.isInfinite) return GlueNull();
+        if (val.n.isNegative) return GlueNull();
+        return GlueString(String.fromCharCode(val.n.toInt()));
+      }
+
+      return GlueNull();
+    });
   }
 
   GlueValue evaluate(String str, [GlueStack? vmStack]) {
