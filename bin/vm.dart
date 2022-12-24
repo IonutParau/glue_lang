@@ -576,9 +576,9 @@ class GlueVM {
       return GlueNumber(list.vals.length.toDouble());
     });
 
-    globals["list-remote-at"] = GlueExternalFunction((vm, stack, args) {
+    globals["list-remove-at"] = GlueExternalFunction((vm, stack, args) {
       args = processedArgs(stack, args);
-      if (args.length != 2) throw "list-remote-at wasn't given 2 arguments (more specifically, was given ${args.length})";
+      if (args.length != 2) throw "list-remove-at wasn't given 2 arguments (more specifically, was given ${args.length})";
 
       final list = args[0];
       final i = args[1];
@@ -1132,6 +1132,32 @@ class GlueVM {
   ["expression" ["var" "global-fn"] [structName structParts ["table" structFuncBody]]]'''));
 
     globals["str-at"] = GlueMacro(GlueValue.fromString(r'["expression" ["var" "list-get"] [["expression" ["var" "str-split"] [(list-get @args 0) ["string" ""]]] (list-get @args 1)]]'));
+
+    globals["list-insert-at"] = GlueExternalFunction((vm, stack, args) {
+      args = processedArgs(stack, args);
+
+      if (args.length != 3) {
+        throw "list-insert-at wasn't given 3 arguments (more specifically, was given ${args.length})";
+      }
+
+      final list = args[0];
+      final val = args[1];
+      final idx = args[2];
+
+      if (list is! GlueList) return list;
+      if (idx is! GlueNumber) return list;
+
+      if (idx.n.isNegative) return list;
+      if (idx.n.isInfinite) return list;
+      if (idx.n.isNaN) return list;
+
+      final i = idx.n.toInt();
+
+      final l = [...list.vals];
+      l.insert(i, val);
+
+      return GlueList(l);
+    });
   }
 
   GlueValue evaluate(String str, [GlueStack? vmStack]) {

@@ -285,7 +285,7 @@ Usage:
 
 Returns the length of a list.
 
-## list-remote-at
+## list-remove-at
 
 Takes a list and an index, returns a new list copy with that index removed.
 
