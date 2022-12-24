@@ -531,3 +531,11 @@ A macro. It will split a string by `""`, then index it.
 ; Equivalent to
 (print (list-get (str-split "Test" "") 3)) ; which also prints s
 ```
+
+## list-insert-at
+
+Returns a copy of a list with a value inserted at an index.
+
+```lisp
+(print (list-insert-at [5 3 2] 3 1)) ; Prints [5, 3, 3, 2]
+```
