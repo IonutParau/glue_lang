@@ -18,7 +18,15 @@ class GlueExpression extends GlueValue {
       return vals.last;
     }
 
-    return operation.toValue(vm, stack).invoke(vm, stack, args);
+    try {
+      return operation.toValue(vm, stack).invoke(vm, stack, args);
+    } catch (e) {
+      if (e is String) {
+        throw GlueError(e, faulty: this);
+      } else {
+        rethrow;
+      }
+    }
   }
 
   @override

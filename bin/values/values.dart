@@ -16,6 +16,43 @@ part 'macro.dart';
 part 'function.dart';
 part 'variable.dart';
 
+class GlueCodeLocation {
+  String? file;
+  int? line;
+
+  GlueCodeLocation({this.file, this.line});
+
+  @override
+  String toString() {
+    if (file == null && line == null) return "";
+
+    return "$file:$line";
+  }
+}
+
+class GlueError {
+  String error;
+  GlueValue? faulty;
+  GlueCodeLocation? location;
+
+  GlueError(this.error, {this.faulty, this.location});
+
+  @override
+  String toString() {
+    var str = error;
+
+    if (faulty != null) {
+      str += "\nFaulty Code: ${glueDisassemble(faulty!)}";
+    }
+
+    if (location != null) {
+      str += "\nLocation: $location";
+    }
+
+    return str;
+  }
+}
+
 String glueUncomment(String str) {
   final lines = str.split('\n');
   final uncommented = [];
