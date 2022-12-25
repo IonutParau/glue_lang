@@ -3,8 +3,9 @@ part of glue_values;
 class GlueFunction extends GlueValue {
   List<String> args;
   GlueValue body;
+  GlueStack stack;
 
-  GlueFunction(this.args, this.body);
+  GlueFunction(this.args, this.body, this.stack);
 
   @override
   String asString(GlueVM vm, GlueStack stack) {
@@ -21,7 +22,7 @@ class GlueFunction extends GlueValue {
     args = processedArgs(vm, stack, args);
 
     // Local stack
-    final lstack = GlueStack();
+    final lstack = stack.linked;
 
     lstack.push("\$self", this);
 

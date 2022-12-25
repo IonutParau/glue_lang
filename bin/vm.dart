@@ -14,28 +14,36 @@ class GlueStackVar {
 class GlueStack {
   final List<GlueStackVar> _stack = [];
 
-  final List<int> _old = [];
+  /// For lexical scoping
+  GlueStack get linked {
+    final gs = GlueStack();
+    gs._stack.addAll(_stack);
+    gs._cache.addAll(_cache);
+    return gs;
+  }
+
+  final _cache = <String, GlueStackVar>{};
 
   void push(String name, GlueValue val) {
-    _stack.add(GlueStackVar(name, val));
+    final v = GlueStackVar(name, val);
+    _stack.add(v);
+    _cache[name] = v;
+  }
+
+  void set(String name, GlueValue val) {
+    _cache[name]?.val = val;
   }
 
   void empty() {
     _stack.clear();
-  }
-
-  void save() {
-    _old.add(_stack.length);
-  }
-
-  void restore() {
-    if (_old.isEmpty) return;
-    while (_stack.length > _old.last) {
-      _stack.removeLast();
-    }
+    _cache.clear();
   }
 
   GlueValue? read(String name) {
+    if (_cache[name] != null) {
+      return _cache[name]?.val;
+    }
+
     var i = _stack.length - 1;
 
     while (i >= 0) {
@@ -416,7 +424,7 @@ class GlueVM {
         if (param is GlueVariable) a.add(param.varname);
       }
 
-      return GlueFunction(a, body);
+      return GlueFunction(a, body, stack.linked);
     });
 
     globals["fn"] = GlueExternalFunction((vm, stack, args) {
@@ -435,9 +443,32 @@ class GlueVM {
         if (param is GlueVariable) a.add(param.varname);
       }
 
-      final func = GlueFunction(a, body);
+      final func = GlueFunction(a, body, stack.linked);
 
       stack.push(name.varname, func);
+
+      return func;
+    });
+
+    globals["set-fn"] = GlueExternalFunction((vm, stack, args) {
+      if (args.length != 3) throw "Function definitions need 3 arguments: Name, parameters and body.";
+
+      final name = args[0];
+      final params = args[1];
+      final body = args[2];
+
+      if (name is! GlueVariable) throw "Function name must be a variable.";
+      if (params is! GlueList) throw "Parameters must be list expression.";
+
+      final a = <String>[];
+
+      for (var param in params.vals) {
+        if (param is GlueVariable) a.add(param.varname);
+      }
+
+      final func = GlueFunction(a, body, stack.linked);
+
+      stack.set(name.varname, func);
 
       return func;
     });
@@ -458,7 +489,7 @@ class GlueVM {
         if (param is GlueVariable) a.add(param.varname);
       }
 
-      final func = GlueFunction(a, body);
+      final func = GlueFunction(a, body, stack.linked);
 
       vm.globals[name.varname] = func;
 
@@ -473,9 +504,24 @@ class GlueVM {
 
       if (name is! GlueVariable) throw "Macro name must be a variable.";
 
-      final macro = GlueMacro(body);
+      final macro = GlueMacro(body, stack.linked);
 
       stack.push(name.varname, macro);
+
+      return macro;
+    });
+
+    globals["set-macro"] = GlueExternalFunction((vm, stack, args) {
+      if (args.length != 2) throw "Macro definitions need 2 arguments: Name and body. (If you need arguments, for obvious reasons, use the @args variable)";
+
+      final name = args[0];
+      final body = args[1];
+
+      if (name is! GlueVariable) throw "Macro name must be a variable.";
+
+      final macro = GlueMacro(body, stack.linked);
+
+      stack.set(name.varname, macro);
 
       return macro;
     });
@@ -488,7 +534,7 @@ class GlueVM {
 
       if (name is! GlueVariable) throw "Global Macro name must be a variable.";
 
-      final macro = GlueMacro(body);
+      final macro = GlueMacro(body, stack.linked);
 
       vm.globals[name.varname] = macro;
 
@@ -759,6 +805,22 @@ class GlueVM {
       return val;
     });
 
+    globals["set"] = GlueExternalFunction((vm, stack, args) {
+      if (args.length != 2) throw "var wasn't given 2 arguments (more specifically, was given ${args.length})";
+
+      final name = args[0];
+      final val = args[1].toValue(vm, stack);
+
+      if (name is GlueVariable) {
+        stack.set(name.varname, val);
+      }
+      if (name is GlueString) {
+        stack.set(name.str, val);
+      }
+
+      return val;
+    });
+
     globals["typeof"] = GlueExternalFunction((vm, stack, args) {
       if (args.length != 1) throw "typeof wasn't given 1 argument (more specifically, was given ${args.length})";
 
@@ -937,8 +999,6 @@ class GlueVM {
     });
 
     globals["for"] = GlueExternalFunction((vm, stack, args) {
-      stack.save();
-
       if (args.length != 4) {
         throw "for wasn't given 4 arguments (more specifically, was given ${args.length})";
       }
@@ -959,7 +1019,6 @@ class GlueVM {
         next.toValue(vm, stack);
       }
 
-      stack.restore();
       return last;
     });
 
@@ -1116,7 +1175,7 @@ class GlueVM {
     globals["field"] = GlueMacro(GlueValue.fromString('''(if-else (= (list-size @args) 3)
     ["expression" ["var" "table-set"] [(list-get @args 0) ["string" (list-get (list-get @args 1) 1)] (list-get @args 2)]]
     ["expression" ["var" "table-get"] [(list-get @args 0) ["string" (list-get (list-get @args 1) 1)]]]
-  )'''));
+  )'''), GlueStack());
 
     globals["struct"] = GlueMacro(GlueValue.fromString('''(var structName (list-get @args 0))
   (var structParts (list-get @args 1))
@@ -1129,9 +1188,9 @@ class GlueVM {
     (var structFuncBody (table-set structFuncBody ["string" (list-get field 1)] field))
   ))
 
-  ["expression" ["var" "global-fn"] [structName structParts ["table" structFuncBody]]]'''));
+  ["expression" ["var" "global-fn"] [structName structParts ["table" structFuncBody]]]'''), GlueStack());
 
-    globals["str-at"] = GlueMacro(GlueValue.fromString(r'["expression" ["var" "list-get"] [["expression" ["var" "str-split"] [(list-get @args 0) ["string" ""]]] (list-get @args 1)]]'));
+    globals["str-at"] = GlueMacro(GlueValue.fromString(r'["expression" ["var" "list-get"] [["expression" ["var" "str-split"] [(list-get @args 0) ["string" ""]]] (list-get @args 1)]]'), GlueStack());
 
     globals["list-insert-at"] = GlueExternalFunction((vm, stack, args) {
       args = processedArgs(stack, args);

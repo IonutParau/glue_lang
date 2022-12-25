@@ -2,14 +2,15 @@ part of glue_values;
 
 class GlueMacro extends GlueValue {
   GlueValue macro;
+  GlueStack stack;
 
-  GlueMacro(this.macro);
+  GlueMacro(this.macro, this.stack);
 
   // Basically: Create new variable stack, give it AST, turn it into value (so from s-expressions to final AST)
   // then return value from AST.
   @override
   GlueValue invoke(GlueVM vm, GlueStack stack, List<GlueValue> args) {
-    final macroStack = GlueStack();
+    final macroStack = stack.linked;
 
     // Push Abstract Syntax Tree
     macroStack.push("@args", GlueList(args.map((e) => e.forMacros()).toList()));

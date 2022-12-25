@@ -224,6 +224,10 @@ Usage:
 (print (my-function 5))
 ```
 
+## set-fn
+
+Like `fn`, but instead of defining, sets a local (if it exists) to that value.
+
 ## global-fn
 
 Like `fn`, but defines a global.
@@ -343,6 +347,10 @@ Takes a string, and parses it as a Glue value and also returns its processed val
 ## var
 
 You've probably already seen this. Takes a variable name and value. Processes the value and pushes a new variable onto the local stack a variable of that name with the value.
+
+## set
+
+Set a variable to a (processed) value.
 
 ## typeof
 

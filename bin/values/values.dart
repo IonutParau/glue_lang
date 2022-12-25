@@ -174,11 +174,11 @@ abstract class GlueValue {
         if (a is GlueString) args.add(a.str);
       }
 
-      return GlueFunction(args, GlueValue.fromMacro(bodyAST));
+      return GlueFunction(args, GlueValue.fromMacro(bodyAST), GlueStack());
     }
 
     if (type == "macro" && val.vals.length > 1) {
-      return GlueMacro(GlueValue.fromMacro(val.vals[0]));
+      return GlueMacro(GlueValue.fromMacro(val.vals[0]), GlueStack());
     }
 
     return GlueNull();

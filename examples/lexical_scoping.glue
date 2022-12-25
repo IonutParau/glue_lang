@@ -1,0 +1,6 @@
+(var x 5)
+(fn set-x [newx] (
+  (set x newx)
+))
+(set-x 102)
+(print x)
