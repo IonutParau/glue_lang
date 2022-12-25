@@ -15,11 +15,15 @@ In these docs you'll hear that data is sometimes "processed", and sometimes "unp
 
 The functions defined in Glue code receive arguments that are automatically processed. However, external functions get unprocessed data, thus functions defined by Glue itself and not by your Glue code might use unprocessed arguments as if they were macros. Some functions only process SOME functions.
 
-Also, functions can't read locals outside of their body. If you need them to have access to a value defined "outside", use globals.
-
 ## A note on macros
 
 Macros don't have named arguments. They have a local variable called `@args`, which stores a list of the converted AST of its arguments. It also must return an AST (later we will cover the expected format)
+
+## A note on scoping
+
+Glue supports lexical scoping and works in the way you'd expect.
+
+Please note: Any local variable defined in any part of `if`'s body, `unless`'s body, `for`'s body, `for-each`'s body, `while`'s body, a function body and a macro body automatically get removed at their end.
 
 # The building blocks
 

@@ -104,7 +104,7 @@ class GlueVM {
       final body = args[1];
 
       if (condition is GlueBool) {
-        if (condition.b) return body.toValue(vm, stack);
+        if (condition.b) return body.toValue(vm, stack.linked);
       }
 
       return GlueNull();
@@ -120,7 +120,7 @@ class GlueVM {
       final fallback = args[2];
 
       if (condition is GlueBool) {
-        if (condition.b) return body.toValue(vm, stack);
+        if (condition.b) return body.toValue(vm, stack.linked);
       }
 
       return fallback.toValue(vm, stack);
@@ -135,7 +135,7 @@ class GlueVM {
       final body = args[1];
 
       if (condition is GlueBool) {
-        if (!condition.b) return body.toValue(vm, stack);
+        if (!condition.b) return body.toValue(vm, stack.linked);
       }
 
       return GlueNull();
@@ -1015,7 +1015,7 @@ class GlueVM {
         final result = condition.toValue(vm, stack);
         if (result is! GlueBool) break;
         if (!result.b) break;
-        last = body.toValue(vm, stack);
+        last = body.toValue(vm, stack.linked);
         next.toValue(vm, stack);
       }
 
@@ -1033,10 +1033,10 @@ class GlueVM {
       final body = args[1];
 
       while (true) {
-        final result = condition.toValue(vm, stack);
+        final result = condition.toValue(vm, stack.linked);
         if (result is! GlueBool) break;
         if (!result.b) break;
-        last = body.toValue(vm, stack);
+        last = body.toValue(vm, stack.linked);
       }
 
       return last;
@@ -1073,7 +1073,7 @@ class GlueVM {
         for (var v in val.vals) {
           stack.push(varNames[0], GlueNumber(i.toDouble()));
           stack.push(varNames[1], v);
-          last = body.toValue(vm, stack);
+          last = body.toValue(vm, stack.linked);
           i++;
         }
       } else if (val is GlueTable) {
