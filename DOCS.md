@@ -551,3 +551,13 @@ Returns a copy of a list with a value inserted at an index.
 ```lisp
 (print (list-insert-at [5 3 2] 3 1)) ; Prints [5, 3, 3, 2]
 ```
+
+## set-field
+
+Sets a variable to a copy of it with a modified field.
+
+```lisp
+(var x {"field" 5})
+(set-field x field 2)
+(print (field x field)) ; Prints 2
+```

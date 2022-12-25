@@ -1217,6 +1217,8 @@ class GlueVM {
 
       return GlueList(l);
     });
+
+    globals["set-field"] = GlueMacro(GlueValue.fromString('["expression" ["var" "set"] [(list-get @args 0) ["expression" ["var" "field"] @args]]]'), GlueStack());
   }
 
   GlueValue evaluate(String str, [GlueStack? vmStack]) {
