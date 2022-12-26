@@ -41,6 +41,8 @@ true ; A boolean (there is also false).
 ("a" (print "Hello, world!") (write "Test") [1 2 3]) ; Another s-expression (since operation isn't a variable, when processed, will process the operation and all arguments but return last argument's processed value (or the operation's processed value if there are no arguments))
 ```
 
+Please note: S-expressions can be inferred inside of the REPL or in `eval`.
+
 # The standard library
 
 A set of external functions and macros that you can use to make your program work.
