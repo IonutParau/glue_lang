@@ -229,7 +229,39 @@ abstract class GlueValue {
     if (double.tryParse(str) != null) return GlueNumber(double.parse(str));
     if (str == "true" || str == "false") return GlueBool(str == "true");
     if (str.startsWith('"') && str.endsWith('"')) {
-      return GlueString(str.substring(1, str.length - 1));
+      final substrchars = str.substring(1, str.length - 1).split("");
+      var s = "";
+      var hasEscape = false;
+
+      for (var char in substrchars) {
+        if (char == "n" && hasEscape) {
+          s += "\n";
+          hasEscape = false;
+          continue;
+        }
+        if (char == "t" && hasEscape) {
+          s += "\t";
+          hasEscape = false;
+          continue;
+        }
+        if (char == "\"" && hasEscape) {
+          s += "\"";
+          hasEscape = false;
+          continue;
+        }
+        if (hasEscape) {
+          s += char;
+          hasEscape = false;
+          continue;
+        }
+        if (char == "\\") {
+          hasEscape = true;
+          continue;
+        }
+        s += char;
+        hasEscape = false;
+      }
+      return GlueString(s);
     }
     if (str.startsWith('`') && str.endsWith('`')) {
       return GlueRegex(RegExp(str.substring(1, str.length - 1)));

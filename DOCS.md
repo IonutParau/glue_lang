@@ -563,3 +563,37 @@ Sets a variable to a copy of it with a modified field.
 (set-field x field 2)
 (print (field x field)) ; Prints 2
 ```
+
+## str-trim
+
+Trims a string for characters that shouldn't normally be there
+
+## str-sub
+
+Gives a substring, aka a part of a string with a start (from 0 to length-1) and an end (from 1 to length)
+
+## inf
+
+This is a global. It holds `infinity`.
+
+## -inf
+
+This is like `inf`, but stores `negative infinity`.
+
+## nan
+
+This stores `NaN`, which is typically returned when math goes wrong
+
+## math-sqrt
+
+Gives the square root of a number.
+
+## list-join
+
+Joins a list of values as a singular string with a specified separator.
+
+## str-indexof
+
+Returns the index of a pattern (2nd argument) inside of a string (1st argument).
+The pattern can be either another string, or a regex.
+If the pattern is neither, it'll be stringified.

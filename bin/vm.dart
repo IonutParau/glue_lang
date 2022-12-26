@@ -1219,6 +1219,82 @@ class GlueVM {
     });
 
     globals["set-field"] = GlueMacro(GlueValue.fromString('["expression" ["var" "set"] [(list-get @args 0) ["expression" ["var" "field"] @args]]]'), GlueStack());
+
+    globals["str-trim"] = GlueExternalFunction((vm, stack, args) {
+      args = processedArgs(stack, args);
+      if (args.length != 1) throw "str-trim wasn't given 1 argument (more specifically, was given ${args.length})";
+
+      final str = args[0].asString(vm, stack);
+
+      return GlueString(str.trim());
+    });
+
+    globals["str-sub"] = GlueExternalFunction((vm, stack, args) {
+      args = processedArgs(stack, args);
+
+      if (args.length != 3) {
+        throw "str-sub wasn't given 3 arguments (more specifically, was given ${args.length})";
+      }
+
+      final str = args[0].asString(vm, stack);
+      final start = args[1];
+      final end = args[2];
+
+      if (start is! GlueNumber) return GlueString(str);
+      if (end is! GlueNumber) return GlueString(str);
+
+      if (start.n.isInfinite || start.n.isNaN || start.n.isNegative) return GlueString(str);
+      if (end.n.isInfinite || end.n.isNaN || end.n.isNegative) return GlueString(str);
+
+      return GlueString(str.substring(start.n.toInt(), end.n.toInt()));
+    });
+
+    globals["inf"] = GlueNumber(double.infinity);
+    globals["-inf"] = GlueNumber(double.negativeInfinity);
+    globals["nan"] = GlueNumber(double.nan);
+
+    globals["list-join"] = GlueExternalFunction((vm, stack, args) {
+      args = processedArgs(stack, args);
+
+      if (args.length != 2) {
+        throw "list-join wasn't given 3 arguments (more specifically, was given ${args.length})";
+      }
+
+      final l = args[0];
+      final sep = args[1].asString(vm, stack);
+
+      if (l is! GlueList) return l;
+
+      return GlueString(l.vals.join(sep));
+    });
+
+    globals["str-indexof"] = GlueExternalFunction((vm, stack, args) {
+      args = processedArgs(stack, args);
+
+      if (args.length != 2) {
+        throw "str-indexof wasn't given 2 arguments (more specifically, was given ${args.length})";
+      }
+
+      final str = args[0].asString(vm, stack);
+      final rawmatch = args[1];
+      final pattern = rawmatch is GlueRegex ? rawmatch.str : rawmatch.asString(vm, stack);
+
+      return GlueNumber(str.indexOf(pattern).toDouble());
+    });
+
+    globals["math-sqrt"] = GlueExternalFunction((vm, stack, args) {
+      args = processedArgs(stack, args);
+
+      if (args.length != 1) {
+        throw "math-sqrt wasn't given 1 argument (more specifically, was given ${args.length})";
+      }
+
+      final n = args[0];
+
+      if (n is! GlueNumber) return n;
+
+      return GlueNumber(sqrt(n.n));
+    });
   }
 
   GlueValue evaluate(String str, [GlueStack? vmStack]) {
