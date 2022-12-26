@@ -460,10 +460,6 @@ A foreach loop.
 Processes the first argument, then if it is a list or table, iterates over its key-value pairs and parses the 3rd argument.
 The 2nd argument is just a parameter list for the key and value parameter names.
 
-### Small note on the loops
-
-Every local defined inside of the loops is not removed. It is kept.
-
 ## disassemble
 
 Takes one argument. Turns it into a string as Glue code.
