@@ -2,8 +2,11 @@
 
 ## A note on mutability
 
-Data in Glue is **immutable**.
-This means that once defined, it is that way forever.
+Variables in Glue are mutable, yet data is immutable.
+Variables can change what data they hold, but the data itself cant experience a mutation.
+
+This means, for example, if you have a list of 5 elements, it is that way forever.
+Any changes are returned as a new list that you're expected to set the variable to.
 <br />
 There are ways to work around it, but are not recommended.
 
