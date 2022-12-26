@@ -16,7 +16,7 @@ In these docs you'll hear that data is sometimes "processed", and sometimes "unp
 
 ## A note on functions
 
-The functions defined in Glue code receive arguments that are automatically processed. However, external functions get unprocessed data, thus functions defined by Glue itself and not by your Glue code might use unprocessed arguments as if they were macros. Some functions only process SOME functions.
+The functions defined in Glue code receive arguments that are automatically processed. However, external functions get unprocessed data, thus functions defined by Glue itself and not by your Glue code might use unprocessed arguments as if they were macros. Some functions only process SOME arguments.
 
 ## A note on macros
 
