@@ -596,3 +596,51 @@ Joins a list of values as a singular string with a specified separator.
 Returns the index of a pattern (2nd argument) inside of a string (1st argument).
 The pattern can be either another string, or a regex.
 If the pattern is neither, it'll be stringified.
+
+## rng-bool
+
+Generates a random boolean
+
+## rng-num
+
+Generates a random floating point number greater or equal to 0 but less than 1.
+
+## rng-str
+
+Generates a random string of 256 characters (only letters and digits).
+
+## start-timer
+
+Takes an ID. Returns the ID, but also starts a timer.
+
+## end-timer
+
+Takes an ID. Returns the ID, but also ends a timer.
+
+## time-of-timer
+
+Takes an ID. Returns the amount of milliseconds ellapsed.
+
+## str-has
+
+Returns if a string contains a match of a pattern or a substring.
+
+## str-starts
+
+Returns if a string starts with a string or pattern.
+
+## str-ends
+
+Returns if a string ends with another.
+
+## str-replace
+
+Returns a string with all matches of a pattern or all instances of a substring replaced with another string.
+
+## assert
+
+If a condition isn't `true`, it throws a specified error. Else, returns the result of the condition.
+
+## error
+
+Takes an error message, throws it.

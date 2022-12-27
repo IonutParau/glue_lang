@@ -1,7 +1,9 @@
+import 'dart:async';
 import 'dart:io';
 import 'dart:math';
 import 'package:path/path.dart' as path;
 
+import 'glue_lang.dart';
 import 'values/values.dart';
 
 class GlueStackVar {
@@ -1295,7 +1297,148 @@ class GlueVM {
 
       return GlueNumber(sqrt(n.n));
     });
+
+    globals["rng-bool"] = GlueExternalFunction((vm, stack, args) {
+      return GlueBool(rng.nextBool());
+    });
+
+    globals["rng-num"] = GlueExternalFunction((vm, stack, args) {
+      return GlueNumber(rng.nextDouble());
+    });
+
+    globals["rng-str"] = GlueExternalFunction((vm, stack, args) {
+      var s = "";
+      final chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".split('');
+
+      for (var i = 0; i < 256; i++) {
+        chars.shuffle();
+        s += chars.first;
+      }
+
+      return GlueString(s);
+    });
+
+    globals["start-timer"] = GlueExternalFunction((vm, stack, args) {
+      args = processedArgs(stack, args);
+      if (args.length != 1) {
+        throw "start-timer wasn't given 1 argument (more specifically, was given ${args.length})";
+      }
+
+      final id = args[0].asString(vm, stack);
+
+      timers[id]?.stop();
+      timers[id] = Stopwatch()..start();
+
+      return GlueString(id);
+    });
+
+    globals["end-timer"] = GlueExternalFunction((vm, stack, args) {
+      args = processedArgs(stack, args);
+      if (args.length != 1) {
+        throw "end-timer wasn't given 1 argument (more specifically, was given ${args.length})";
+      }
+
+      final id = args[0].asString(vm, stack);
+
+      timers[id]?.stop();
+
+      return GlueString(id);
+    });
+
+    globals["time-of-timer"] = GlueExternalFunction((vm, stack, args) {
+      args = processedArgs(stack, args);
+      if (args.length != 1) {
+        throw "end-timer wasn't given 1 argument (more specifically, was given ${args.length})";
+      }
+
+      final id = args[0].asString(vm, stack);
+
+      return GlueNumber(timers[id]?.elapsedMilliseconds.toDouble() ?? 0);
+    });
+
+    globals["str-has"] = GlueExternalFunction((vm, stack, args) {
+      args = processedArgs(stack, args);
+      if (args.length != 2) {
+        throw "str-has wasn't given 2 arguments (more specifically, was given ${args.length})";
+      }
+
+      final str = args[0].asString(vm, stack);
+      final patternVal = args[1];
+      final pattern = patternVal is GlueRegex ? patternVal.str : patternVal.asString(vm, stack);
+
+      return GlueBool(pattern is String ? str.contains(pattern) : (pattern as RegExp).hasMatch(str));
+    });
+
+    globals["str-starts"] = GlueExternalFunction((vm, stack, args) {
+      args = processedArgs(stack, args);
+      if (args.length != 2) {
+        throw "str-starts wasn't given 2 arguments (more specifically, was given ${args.length})";
+      }
+
+      final str = args[0].asString(vm, stack);
+      final patternVal = args[1];
+      final pattern = patternVal is GlueRegex ? patternVal.str : patternVal.asString(vm, stack);
+
+      return GlueBool(str.startsWith(pattern));
+    });
+
+    globals["str-ends"] = GlueExternalFunction((vm, stack, args) {
+      args = processedArgs(stack, args);
+      if (args.length != 2) {
+        throw "str-ends wasn't given 2 arguments (more specifically, was given ${args.length})";
+      }
+
+      final str = args[0].asString(vm, stack);
+      final pattern = args[1].asString(vm, stack);
+
+      return GlueBool(str.endsWith(pattern));
+    });
+
+    globals["str-replace"] = GlueExternalFunction((vm, stack, args) {
+      args = processedArgs(stack, args);
+      if (args.length != 3) {
+        throw "str-replace wasn't given 3 arguments (more specifically, was given ${args.length})";
+      }
+
+      final str = args[0].asString(vm, stack);
+      final patternVal = args[1];
+      final pattern = patternVal is GlueRegex ? patternVal.str : patternVal.asString(vm, stack);
+      final replacement = args[2].asString(vm, stack);
+
+      return GlueString(str.replaceAll(pattern, replacement));
+    });
+
+    globals["assert"] = GlueExternalFunction((vm, stack, args) {
+      args = processedArgs(stack, args);
+      if (args.length != 2) {
+        throw "assert wasn't given 2 arguments (more specifically, was given ${args.length})";
+      }
+
+      final condition = args[0];
+      final error = args[1].asString(vm, stack);
+
+      if (condition is! GlueBool || !condition.b) {
+        throw error;
+      }
+
+      return condition;
+    });
+
+    globals["error"] = GlueExternalFunction((vm, stack, args) {
+      args = processedArgs(stack, args);
+      if (args.length != 1) {
+        throw "error wasn't given 1 argument (more specifically, was given ${args.length})";
+      }
+
+      throw args[0].asString(vm, stack);
+    });
   }
+
+  final rng = Random();
+  final timers = <String, Stopwatch>{};
+
+  // (list-extract)
+  // (list-var-extract)
 
   GlueValue evaluate(String str, [GlueStack? vmStack]) {
     final expr = GlueValue.fromString(str);
