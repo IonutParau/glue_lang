@@ -1,8 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
-
-import 'values/values.dart';
-import 'vm.dart';
+import 'package:glue_lang/glue.dart';
 
 void repl() {
   print("Glue REPL v0.0.1");
@@ -61,6 +59,7 @@ void main(List<String> arguments) {
 
     final vm = GlueVM();
     vm.loadStandard();
+    vm.globals['@cmdargs'] = GlueList(arguments.sublist(1).map((a) => GlueString(a)).toList());
     vm.evaluate(file.readAsStringSync());
   }
 }
