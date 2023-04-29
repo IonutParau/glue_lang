@@ -457,7 +457,6 @@ class GlueVM {
       final params = args[1];
       final body = args[2];
 
-      if (name is! GlueVariable) throw "Function name must be a variable.";
       if (params is! GlueList) throw "Parameters must be list expression.";
 
       final a = <String>[];
@@ -468,7 +467,13 @@ class GlueVM {
 
       final func = GlueFunction(a, body, stack.linked);
 
-      stack.set(name.varname, func);
+      if (name is GlueVariable) {
+        stack.set(name.varname, func);
+      } else if (name is GlueIndex) {
+        name.writeValue(vm, stack, func);
+      } else {
+        throw "set-fn expects you to set the macro to either a variable or index";
+      }
 
       return func;
     });
@@ -516,12 +521,15 @@ class GlueVM {
 
       final name = args[0];
       final body = args[1];
-
-      if (name is! GlueVariable) throw "Macro name must be a variable.";
-
       final macro = GlueMacro(body, stack.linked);
 
-      stack.set(name.varname, macro);
+      if (name is GlueVariable) {
+        stack.set(name.varname, macro);
+      } else if (name is GlueIndex) {
+        name.writeValue(vm, stack, macro);
+      } else {
+        throw "set-macro expects you to set the macro to either a variable or index";
+      }
 
       return macro;
     });
@@ -816,6 +824,9 @@ class GlueVM {
       }
       if (name is GlueString) {
         stack.set(name.str, val);
+      }
+      if (name is GlueIndex) {
+        name.writeValue(vm, stack, val);
       }
 
       return val;

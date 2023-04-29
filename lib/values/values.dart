@@ -15,6 +15,7 @@ part 'table.dart';
 part 'macro.dart';
 part 'function.dart';
 part 'variable.dart';
+part 'index.dart';
 
 class GlueCodeLocation {
   String? file;
@@ -133,6 +134,38 @@ String glueFixStr(String str) {
   }
 
   return s.trim();
+}
+
+bool glueIsVariableName(String str) {
+  if (str.isEmpty) return false;
+
+  if (str.startsWith('(') && str.endsWith(')')) {
+    return false;
+  }
+
+  if (str.startsWith('[') && str.endsWith(']')) {
+    return false;
+  }
+
+  if (str.startsWith('{') && str.endsWith('}')) {
+    return false;
+  }
+
+  if (str.startsWith('"') && str.endsWith('"')) {
+    return false;
+  }
+
+  if (str.startsWith('`') && str.endsWith('`')) {
+    return false;
+  }
+
+  if (str == 'true' || str == 'false') return false;
+
+  return true;
+}
+
+bool glueIsFieldAccess(String str) {
+  return str.split('.').fold(true, (v, name) => v && glueIsVariableName(name));
 }
 
 abstract class GlueValue {
@@ -299,6 +332,15 @@ abstract class GlueValue {
       }
 
       return GlueTable(table);
+    }
+
+    if (str.contains('.') && glueIsFieldAccess(str)) {
+      var things = str.split('.');
+
+      final field = things.removeLast();
+      final owner = GlueValue.fromString(things.join('.'));
+
+      return GlueIndex(owner, field);
     }
 
     return GlueVariable(str);

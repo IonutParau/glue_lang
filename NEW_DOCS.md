@@ -79,3 +79,27 @@ There are 2 non-primites: Lists and Tables.
 Important note: Tables are indexed by any value, but it stringifies the value and looks for a match. Table look-ups are currently `O(N)`, where N is the amount of elements in the table. This means it might look through every element in the table for a key match. This is going ot be changed to a proper `hash-map` soon enough.
 
 This also means that `"5"` and `5` will be mapped to the same thing even if they're not the same exact key.
+
+They are written like so:
+
+```lisp
+[50 30 20 10] ; You separate expressions by space
+{"field" "value" "field2" "value2"} ; Table
+```
+
+## Syntactic Sugar
+
+There is syntactic sugar for field indexing.
+In some places you can use field indexing instead of variables.
+This will index a variable. This currently can only index variables, and only if they hold tables, otherwise returning the value of the variable.
+
+They are written as so:
+
+```lisp
+test.field
+```
+
+# Standard Library
+
+The **standard library** is a collection of functions you can use.
+These can make your own useful.

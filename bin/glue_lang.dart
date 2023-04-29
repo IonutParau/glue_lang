@@ -4,7 +4,7 @@ import 'package:glue_lang/glue.dart';
 
 void repl() {
   print("Glue REPL v0.0.1");
-  print("Copyright (c) 2022 Parau Ionut Alexandru");
+  print("Copyright (c) 2022 Pârău Ionuț Alexandru");
   print("License available at https://github.com/IonutParau/glue_lang/blob/main/LICENSE");
   final vm = GlueVM();
   final stack = GlueStack();
