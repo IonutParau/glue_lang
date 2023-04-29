@@ -31,12 +31,4 @@ class GlueIndex extends GlueValue {
 
     return GlueNull();
   }
-
-  void writeValue(GlueVM vm, GlueStack stack, GlueValue value) {
-    final val = owner.toValue(vm, stack);
-
-    if (val is GlueTable) {
-      val.write(vm, stack, GlueString(field), value);
-    }
-  }
 }

@@ -103,3 +103,19 @@ test.field
 
 The **standard library** is a collection of functions you can use.
 These can make your own useful.
+
+## I/O
+
+> I/O means Input / Output and it's how your program can get input and give an output.
+
+### print
+
+> Prints the values given as strings
+
+Prints the values you give it. They are all printed on separate lines.
+
+### write
+
+> Writes the values given as strings
+
+Writes out to the terminal the values you give it as strings. They do not add a "newline character" at the end so they are printed right after each other.

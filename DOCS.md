@@ -71,7 +71,7 @@ Another line
 
 ## write
 
-Processes its arguments and writes all of them to the terminal in sequence (seperated by space).
+Processes its arguments and writes all of them to the terminal in sequence (separated by space).
 
 Usage:
 

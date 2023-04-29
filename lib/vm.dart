@@ -469,10 +469,8 @@ class GlueVM {
 
       if (name is GlueVariable) {
         stack.set(name.varname, func);
-      } else if (name is GlueIndex) {
-        name.writeValue(vm, stack, func);
       } else {
-        throw "set-fn expects you to set the macro to either a variable or index";
+        throw "set-fn expects you to set the macro to a variable";
       }
 
       return func;
@@ -525,8 +523,6 @@ class GlueVM {
 
       if (name is GlueVariable) {
         stack.set(name.varname, macro);
-      } else if (name is GlueIndex) {
-        name.writeValue(vm, stack, macro);
       } else {
         throw "set-macro expects you to set the macro to either a variable or index";
       }
@@ -824,9 +820,6 @@ class GlueVM {
       }
       if (name is GlueString) {
         stack.set(name.str, val);
-      }
-      if (name is GlueIndex) {
-        name.writeValue(vm, stack, val);
       }
 
       return val;
