@@ -119,3 +119,67 @@ Prints the values you give it. They are all printed on separate lines.
 > Writes the values given as strings
 
 Writes out to the terminal the values you give it as strings. They do not add a "newline character" at the end so they are printed right after each other.
+
+### read
+
+> Reads a line from the terminal and returns it.
+
+NOTE: because of grammar rules,
+```lisp
+read
+```
+Will give you the function and
+```lisp
+(read)
+```
+Will actually call the function.
+
+### exit
+
+> Terminates the program
+
+Will exit with an exit code of 0 (which means success).
+This is useful to terminate the program, for example:
+```lisp
+(if (= command "exit") (exit))
+```
+
+### if
+
+> Performs basic conditional logic
+
+It evaluates the first expression, and if that expression is equal to `true`, it will evalute and return the 2nd expression. If not, it will return `null`.
+
+If that is too confusing, here's a simpler explanation:
+```lisp
+(if (= a 3) (print "Hi"))
+```
+This means "Evaluate the expression `(= a 3)`. If that is equal to `true`, then evaluate the expression `(print "Hi")`, which prints `Hi` to the console. If not, then this whole `if` expression is equal to null."
+
+### if-else
+
+> An equivalent to the ternary operator
+
+This is just like `if` however if the first expression is not `true`, it will return the 3rd expression instead of `null`.
+
+If `(if a b)` is the same as this Python code:
+```py
+if a:
+  return b
+else:
+  return None
+```
+
+Then `(if-else a b c)` is the same as:
+```py
+if a:
+  return b
+else:
+  return c
+```
+
+Except both of them can be used as expressions!
+
+### unless
+
+`(unless a b)` is the same as `(if-else a null b)`
